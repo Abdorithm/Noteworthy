@@ -1,3 +1,10 @@
 {
-    "Hello" : "Hello"
+    "Hello" : "Hello",
+    "Search" : "Search",
+    "Home" : "Home",
+    "About" : "About",
+    "Contact" : "Contact",
+    "Settings" : "Settings",
+    "Logout" : "Logout",
+    "My Profile" : "My Profile"
 }
