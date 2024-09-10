@@ -4,6 +4,7 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,10 +14,44 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Post {
+  id        String    @id @default(uuid())
+  content   String
+  title     String
+  favorite  Boolean
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt @default(now())
+  // ... add other fields as needed
+
+  owner     User      @relation(fields: [ownerId], references: [id])
+  ownerId   String
+  comments  Comment[]
+}
+
+model Comment {
+  id        String    @id @default(uuid())
+  parentId  String?
+  userId    String
+  postId    String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt @default(now())
+  // ... add other fields as needed
+
+  parent    Comment?  @relation("ChildComments", fields: [parentId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+  post      Post      @relation(fields: [postId], references: [id])
+
+  Comment   Comment[] @relation("ChildComments")
+}
+
 model User {
-  id        Int       @id @default(autoincrement())   
+  id        String    @id @default(uuid())
   firstName String
   lastName  String
   username  String
   email     String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt @default(now())
+  posts     Post[]
+  comments  Comment[]
 }

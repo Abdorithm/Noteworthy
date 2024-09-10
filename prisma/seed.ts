@@ -9,7 +9,7 @@ async function main() {
       firstName: "Abdo",
       lastName: "Magdi",
       email: "abdo@king.com",
-      username: "username",
+      username: "abdorithm",
     },
   });
 }
