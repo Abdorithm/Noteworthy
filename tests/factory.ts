@@ -1,3 +1,5 @@
+// this file is used to create factories for the tests
+// which can be used to create specific test data.
 import { createUser as createDbUser } from "~/.server/models/user.model";
 import { faker } from "@faker-js/faker";
 import { User } from "@prisma/client";
