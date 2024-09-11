@@ -7,7 +7,7 @@ import {
   useLoaderData,
 } from "@remix-run/react";
 import "./tailwind.css";
-import { LoaderFunctionArgs, json } from "@remix-run/node";
+import { LinksFunction, LoaderFunctionArgs, json } from "@remix-run/node";
 import i18next from "./localization/i18n.server";
 import { useTranslation } from "react-i18next";
 import { useChangeLanguage } from "remix-i18next/react";
@@ -15,11 +15,11 @@ import { returnLanguageIfSupported } from "./localization/resource";
 import clsx from "clsx"
 import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from "remix-themes" 
 import { themeSessionResolver } from "./sessions.server"
+import type { MetaFunction } from "@remix-run/node";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const lang = returnLanguageIfSupported(params.lang);
-    const locale = lang ?? (await i18next.getLocale(request));
-
+  const locale = lang ?? (await i18next.getLocale(request));
   const { getTheme } = await themeSessionResolver(request)
 
   return json({
@@ -36,6 +36,22 @@ export const handle = {
     i18n: "common",
 };
 
+export const meta: MetaFunction = () => {
+  return [
+    { title: "Noteworthy" },
+    { name: "description", content: "Welcome to Noteworthy!" },
+  ];
+};
+
+export const links: LinksFunction = () => {
+  return [
+    { rel: "preconnect", href: "https://fonts.googleapis.com" },
+    { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+    { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" },
+    { rel: "icon", href: "/favicon.ico" },
+  ];
+};
+
 export default function AppWithProviders() {
   const data = useLoaderData<typeof loader>()
   return (
@@ -47,7 +63,6 @@ export default function AppWithProviders() {
 
 export function App() {
   const data = useLoaderData<typeof loader>();
-  console.log(data);
   const { locale } = data;
   const { i18n } = useTranslation();
   useChangeLanguage(locale);
@@ -62,7 +77,7 @@ export function App() {
         <PreventFlashOnWrongTheme ssrTheme={Boolean(data.theme)} />
         <Links />
       </head>
-      <body>
+      <body className="font-rubik">
         <Outlet />
         <ScrollRestoration />
         <Scripts />

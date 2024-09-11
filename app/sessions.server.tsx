@@ -7,7 +7,6 @@ const isProduction = process.env.NODE_ENV === "production"
 const sessionStorage = createCookieSessionStorage({
   cookie: {
     name: "theme",
-    path: "/",
     httpOnly: true,
     sameSite: "lax",
     secrets: ["NjqhlEguQREYKTT3k83vtg3AxrmKnZ3wcr3t"],
