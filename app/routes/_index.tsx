@@ -26,6 +26,10 @@ export default function Index() {
         <ModeToggle />
       </div>
       <LanguageSwitcher />
+      <br />
+      <Link to="/cookieusage" className="text-blue-500 hover:text-blue-700 underline">
+        {t("Cookie Usage")}
+      </Link>
     </div>
   )
 }
