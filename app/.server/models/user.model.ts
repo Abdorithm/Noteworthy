@@ -6,3 +6,40 @@ export const createUser = async (user: Omit<User, "id" | "createdAt" | "updatedA
         data: user,
     });
 }
+
+export const getUserById = async (id: string) => {
+    return prisma.user.findUnique({
+        where: {
+            id,
+        },
+    });
+}
+
+export const getUserByUsername = async (username: string) => {
+    return prisma.user.findUnique({
+        where: {
+            username,
+        },
+    });
+}
+
+export const getUserByEmail = async (email: string) => {
+    return prisma.user.findUnique({
+        where: {
+            email,
+        },
+    });
+}
+
+export const getUserByEmailOrUsername = async (identifier: string) => {
+    const user = await prisma.user.findFirst({
+        where: {
+            OR: [
+                { email: identifier },
+                { username: identifier }
+            ]
+        },
+    });
+
+    return user ? user.id : null;
+}

@@ -15,7 +15,6 @@ export default function Feed() {
     <div>
       <FeedComponent />
       <RedditStyleComments />
-      FEED
     </div>
   );
 }
