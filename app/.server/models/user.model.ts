@@ -7,6 +7,17 @@ export const createUser = async (user: Omit<User, "id" | "createdAt" | "updatedA
     });
 }
 
+export const updateUser = async (id: string, user: Omit<User, "id" | "createdAt">) => {
+    return prisma.user.update({
+        where: {
+            id,
+        },
+        data: {
+            ...user,
+        },
+    });
+}
+
 export const getUserById = async (id: string) => {
     return prisma.user.findUnique({
         where: {

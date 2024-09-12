@@ -15,11 +15,14 @@ export default function Index() {
         {t("Whether you want a personal diary or a platform to share your journey with the world, You're in the right place!")}
       </p>
       <div className="mb-2">
+        <Link to="/feed">
+          <Button variant="outline" className="m-2">{t("Feed")}</Button>
+        </Link>
         <Link to="/register">
-          <Button variant="default" className="m-2">{t("Sign Up")}</Button>
+          <Button variant="default" className="m-2">{t("Sign up")}</Button>
         </Link>
         <Link to="/login">
-          <Button variant="outline" className="m-2">{t("Log In")}</Button>
+          <Button variant="outline" className="m-2">{t("Log in")}</Button>
         </Link>
       </div>
       <div className="mb-2">

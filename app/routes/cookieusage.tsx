@@ -15,7 +15,7 @@ export default function CookieUsage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground">
-      <h1 className="text-4xl font-bold mb-4">Noteworthy&apos;s Cookie Usage</h1>
+      <h1 className="text-4xl font-bold mb-4">{t("Noteworthy's Cookie Policy")}</h1>
       <p className="m-2">
         {t("This website uses cookies to ensure you get the best experience.")}
         <br />

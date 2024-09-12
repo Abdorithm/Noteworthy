@@ -32,5 +32,13 @@
     "Enter the token that was sent to your email": "أدخل الرمز الذي تم إرساله إلى بريدك الإلكتروني",
     "Magic token": "الرمز السحري",
     "Didn't request a token?": "لم تطلب رمزًا سريًا؟",
-    "Request a token": "طلب رمز سري"
+    "Request a token": "طلب رمز سري",
+    "Noteworthy's Cookie Policy": "سياسة الكوكيز لدى Noteworthy",
+    "Account info": "معلومات الحساب",
+    "View and update your account details": "عرض وتحديث تفاصيل حسابك",
+    "Edit": "تعديل",
+    "Cancel": "إلغاء",
+    "Save changes": "حفظ التغييرات",
+    "My comments": "تعليقاتي",
+    "My journals": "مذكراتي"
 }
