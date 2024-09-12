@@ -28,7 +28,7 @@ export default function Index() {
       <LanguageSwitcher />
       <br />
       <Link to="/cookieusage" className="text-blue-500 hover:text-blue-700 underline">
-        {t("Cookie Usage")}
+        {t("Cookie usage")}
       </Link>
     </div>
   )

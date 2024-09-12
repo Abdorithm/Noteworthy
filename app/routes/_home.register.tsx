@@ -94,11 +94,11 @@ export default function Register() {
             <div className="grid gap-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="first-name">First name</Label>
+                  <Label htmlFor="first-name">{t("First name")}</Label>
                   <Input id="first-name" name="first-name" placeholder="Max" required />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="last-name">Last name</Label>
+                  <Label htmlFor="last-name">{t("Last name")}</Label>
                   <Input id="last-name" name="last-name" placeholder="Robinson" required />
                 </div>
               </div>
@@ -113,7 +113,7 @@ export default function Register() {
                 </p>
               )}
               <div className="grid gap-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="username">{t("Username")}</Label>
                 <Input
                   id="username"
                   name="username"
@@ -127,7 +127,7 @@ export default function Register() {
                 )}
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t("Email")}</Label>
                 <Input
                   id="email"
                   name="email"
@@ -142,13 +142,13 @@ export default function Register() {
                 )}
               </div>
               <Button type="submit" className="w-full">
-                Create an account
+                {t("Create an account")}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">
-              Already have an account?{" "}
+              {t("Already have an account?")}{" "}
               <Link to="/login" className="underline">
-                Log in
+                {t("Log in")}
               </Link>
             </div>
           </CardContent>

@@ -101,7 +101,7 @@ export default function VerifyMagic() {
                 </p>
               )}
               <Button type="submit" className="w-full">
-                Log in
+                {t("Log in")}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">

@@ -15,5 +15,22 @@
     "This website uses cookies to ensure you get the best experience." : "يستخدم هذا الموقع الإلكتروني ملفات تعريف الارتباط (الكوكيز) لضمان حصولك على أفضل تجربة.",
     "Our usage is minimal. We use cookies to:" : "استخدامنا للكوكيز هو الحد الأدنى. نحن نستخدم الكوكيز لـ:",
     "Remember & honor your theme preference." : "تذكر واحترام تفضيلاتك للسمة (ليلي أو فاتح).",
-    "Keep you logged in to Noteworthy." : "الاحتفاظ بتسجيل دخولك إلى Noteworthy."
+    "Keep you logged in to Noteworthy." : "الاحتفاظ بتسجيل دخولك إلى Noteworthy.",
+    "Enter your credentials to log in, a magic token will be sent to your email. Tokens expire in 3 minutes": "أدخل البيانات الخاصة بك لتسجيل الدخول، سيتم إرسال رمز سري إلى بريدك الإلكتروني. تنتهي صلاحية الرموز السرية في 3 دقائق",
+    "Username or email": "اسم المستخدم أو البريد الإلكتروني",
+    "Request magic token": "طلب رمز سري",
+    "Don't have an account?": "ليس لديك حساب؟",
+    "Already requested a token?" : "هل طلبت بالفعل رمز سري؟",
+    "Verify token": "التحقق من الرمز",
+    "Enter your information to create an account": "أدخل معلوماتك لإنشاء حساب",
+    "Email": "البريد الإلكتروني",
+    "First name": "الاسم الأول",
+    "Last name": "الاسم الأخير",
+    "Username": "اسم المستخدم",
+    "Already have an account?": "هل لديك حساب؟",
+    "Create an account": "إنشاء حساب",
+    "Enter the token that was sent to your email": "أدخل الرمز الذي تم إرساله إلى بريدك الإلكتروني",
+    "Magic token": "الرمز السحري",
+    "Didn't request a token?": "لم تطلب رمزًا سريًا؟",
+    "Request a token": "طلب رمز سري"
 }

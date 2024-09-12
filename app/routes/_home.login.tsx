@@ -85,13 +85,13 @@ export default function Login() {
           <CardHeader>
             <CardTitle className="text-xl">{t("Log in")}</CardTitle>
             <CardDescription>
-              {t("Enter your credentials to log in, a magic token will be sent to your email. Tokens expire in 3 minutes.")}
+              {t("Enter your credentials to log in, a magic token will be sent to your email. Tokens expire in 3 minutes")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="username-or-email">Username or email</Label>
+                <Label htmlFor="username-or-email">{t("Username or email")}</Label>
                 <Input
                   id="username-or-email"
                   name="username-or-email"
@@ -105,7 +105,7 @@ export default function Login() {
                 )}
               </div>
               <Button type="submit" className="w-full">
-                Request magic token
+                {t("Request magic token")}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">
