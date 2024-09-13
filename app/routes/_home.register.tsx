@@ -1,5 +1,5 @@
 import { ActionFunctionArgs, json, LoaderFunction, redirect } from '@remix-run/node';
-import { Form, Link, useActionData } from '@remix-run/react';
+import { Form, Link, useActionData, useNavigation } from '@remix-run/react';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
@@ -9,8 +9,8 @@ import { z } from 'zod';
 import { createUser, getUserByEmail, getUserByUsername } from '~/.server/models/user.model';
 
 const registerSchema = z.object({
-  'first-name': z.string().min(2, 'First name must be at least 2 characters').max(15, 'First name must be at most 10 characters'),
-  'last-name': z.string().min(2, 'Last name must be at least 2 characters').max(15, 'Last name must be at most 10 characters'),
+  'first-name': z.string().min(2, 'First name must be at least 2 characters').max(15, 'First name must be at most 15 characters'),
+  'last-name': z.string().min(2, 'Last name must be at least 2 characters').max(15, 'Last name must be at most 15 characters'),
   'username': z.string().regex(/^[a-zA-Z0-9]+$/, 'Username must only contain letters and numbers').max(20, 'Username must be at most 20 characters'),
   'email': z.string().email('Invalid email address'),
 });
@@ -79,10 +79,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export default function Register() {
   const { t } = useTranslation();
   const actionData = useActionData<typeof action>();
+  const navigation = useNavigation();
+  const isCreating = navigation.formData?.get('intent') === 'createUser';
 
   return (
     <div className='flex flex-col items-center justify-center min-h-screen'>
       <Form method='post' className='flex flex-col items-center justify-center'>
+        <Input type='hidden' name='intent' value='createUser' />
         <Card className="mx-auto max-w-sm">
           <CardHeader>
             <CardTitle className="text-xl">{t("Sign up")}</CardTitle>
@@ -103,12 +106,12 @@ export default function Register() {
                 </div>
               </div>
               {actionData?.errors?.find(error => error.path.includes('first-name')) && (
-                <p className="text-red-500">
+                <p className="text-rose-600">
                   {actionData.errors.find(error => error.path.includes('first-name'))?.message}
                 </p>
               )}
               {actionData?.errors?.find(error => error.path.includes('last-name')) && (
-                <p className="text-red-500">
+                <p className="text-rose-600">
                   {actionData.errors.find(error => error.path.includes('last-name'))?.message}
                 </p>
               )}
@@ -121,7 +124,7 @@ export default function Register() {
                   required
                 />
                 {actionData?.errors?.find(error => error.path.includes('username')) && (
-                  <p className="text-red-500">
+                  <p className="text-rose-600">
                     {actionData.errors.find(error => error.path.includes('username'))?.message}
                   </p>
                 )}
@@ -136,13 +139,13 @@ export default function Register() {
                   required
                 />
                 {actionData?.errors?.find(error => error.path.includes('email')) && (
-                  <p className="text-red-500">
+                  <p className="text-rose-600">
                     {actionData.errors.find(error => error.path.includes('email'))?.message}
                   </p>
                 )}
               </div>
               <Button type="submit" className="w-full">
-                {t("Create an account")}
+                {isCreating ? t("Creating account...") : t("Create an account")}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">

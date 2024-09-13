@@ -40,5 +40,15 @@
     "Cancel": "إلغاء",
     "Save changes": "حفظ التغييرات",
     "My comments": "تعليقاتي",
-    "My journals": "مذكراتي"
+    "My journals": "مذكراتي",
+    "Requesting token..." : "جاري طلب الرمز...",
+    "Creating account..." : "جاري إنشاء الحساب...",
+    "Verifying token...": "جاري التحقق من الرمز...",
+    "Saving changes..." : "جاري حفظ التغييرات...",
+    "Welcome, @{{ username }}. Got something on your mind?": "مرحبًا، @{{ username }}. هل لديك شيء في ذهنك؟",
+    "Post": "نشر",
+    "View comments": "عرض التعليقات",
+    "Next": "التالي",
+    "Previous": "السابق",
+    "Posting..." : "جاري النشر..."
 }

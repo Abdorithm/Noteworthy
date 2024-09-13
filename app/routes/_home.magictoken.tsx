@@ -1,5 +1,5 @@
 import { ActionFunctionArgs, json, LoaderFunction, LoaderFunctionArgs, redirect } from '@remix-run/node';
-import { Form, Link, useActionData } from '@remix-run/react';
+import { Form, Link, useActionData, useNavigation } from '@remix-run/react';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
@@ -73,10 +73,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export default function VerifyMagic() {
   const { t } = useTranslation();
   const actionData = useActionData<typeof action>();
+  const navigation = useNavigation();
+  const isVerifying = navigation.formData?.get('intent') === 'verifyToken';
 
   return (
     <div className='flex flex-col items-center justify-center min-h-screen'>
       <Form method='post' className='flex flex-col items-center justify-center'>
+        <Input type='hidden' name='intent' value='verifyToken' />
         <Card className="mx-auto max-w-sm">
           <CardHeader>
             <CardTitle className="text-xl">{t("Verify token")}</CardTitle>
@@ -96,12 +99,12 @@ export default function VerifyMagic() {
                 />
               </div>
               {actionData?.errors?.find(error => error.path.includes('magic')) && (
-                <p className="text-red-500">
+                <p className="text-rose-600">
                   {actionData.errors.find(error => error.path.includes('magic'))?.message}
                 </p>
               )}
               <Button type="submit" className="w-full">
-                {t("Log in")}
+                {isVerifying ? t("Verifying token...") : t("Log in")}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">

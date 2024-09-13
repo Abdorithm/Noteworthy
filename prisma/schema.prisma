@@ -6,59 +6,57 @@
 
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider      = "postgresql"
+  url           = env("DATABASE_URL")
 }
 
 model Post {
-  id        String    @id @default(uuid())
-  content   String
-  title     String
-  favorite  Boolean
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt @default(now())
-  // ... add other fields as needed
+  id            String    @id @default(uuid())
+  content       String
+  title         String
+  favorite      Boolean
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt @default(now())
 
-  owner     User      @relation(fields: [ownerId], references: [id])
-  ownerId   String
-  comments  Comment[]
+  owner         User      @relation(fields: [ownerHandle], references: [username])
+  ownerHandle   String
+  comments      Comment[]
 }
 
 model Comment {
-  id        String    @id @default(uuid())
-  parentId  String?
-  userId    String
-  postId    String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt @default(now())
-  // ... add other fields as needed
+  id            String    @id @default(uuid())
+  parentId      String?
+  ownerHandle   String
+  postId        String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt @default(now())
 
-  parent    Comment?  @relation("ChildComments", fields: [parentId], references: [id])
-  user      User      @relation(fields: [userId], references: [id])
-  post      Post      @relation(fields: [postId], references: [id])
+  parent        Comment?  @relation("ChildComments", fields: [parentId], references: [id])
+  user          User      @relation(fields: [ownerHandle], references: [username])
+  post          Post      @relation(fields: [postId], references: [id])
 
-  Comment   Comment[] @relation("ChildComments")
+  Comment       Comment[] @relation("ChildComments")
 }
 
 model User {
-  id        String    @id @default(uuid())
-  firstName String
-  lastName  String
-  username  String    @unique
-  email     String    @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt @default(now())
-  posts     Post[]
-  comments  Comment[]
+  id            String    @id @default(uuid())
+  firstName     String
+  lastName      String
+  username      String    @unique
+  email         String    @unique
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt @default(now())
+  posts         Post[]
+  comments      Comment[]
 }
 
 model MagicToken {
-  id        String   @id @default(uuid())
-  userId    String
-  expiresAt DateTime
-  createdAt DateTime @default(now())
+  id            String   @id @default(uuid())
+  userId        String
+  expiresAt     DateTime
+  createdAt     DateTime @default(now())
 }

@@ -1,5 +1,5 @@
 import { LoaderFunction, ActionFunctionArgs, json, redirect, LoaderFunctionArgs } from '@remix-run/node';
-import { Form, Link, useActionData } from '@remix-run/react';
+import { Form, Link, useActionData, useNavigation } from '@remix-run/react';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
@@ -77,10 +77,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export default function Login() {
   const { t } = useTranslation();
   const actionData = useActionData<typeof action>();
+  const navigation = useNavigation();
+  const isRequesting = navigation.formData?.get('intent') === 'requestToken';
 
   return (
     <div className='flex flex-col items-center justify-center min-h-screen'>
       <Form method='post' className='flex flex-col items-center justify-center'>
+        <Input type='hidden' name='intent' value='requestToken' />
         <Card className="mx-auto max-w-sm">
           <CardHeader>
             <CardTitle className="text-xl">{t("Log in")}</CardTitle>
@@ -99,13 +102,13 @@ export default function Login() {
                   required
                 />
                 {actionData?.errors?.find(error => error.path.includes('username-or-email')) && (
-                  <p className="text-red-500">
+                  <p className="text-rose-600">
                     {actionData.errors.find(error => error.path.includes('username-or-email'))?.message}
                   </p>
                 )}
               </div>
               <Button type="submit" className="w-full">
-                {t("Request magic token")}
+                {isRequesting ? t("Requesting token...") : t("Request magic token")}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">
