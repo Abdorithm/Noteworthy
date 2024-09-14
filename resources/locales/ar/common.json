@@ -50,5 +50,11 @@
     "View comments": "عرض التعليقات",
     "Next": "التالي",
     "Previous": "السابق",
-    "Posting..." : "جاري النشر..."
+    "Posting..." : "جاري النشر...",
+    "Commenting..." : "جاري التعليق...",
+    "Comment": "تعليق",
+    "Reply": "رد",
+    "Replying..." : "جاري الرد...",
+    "Leave a reply": "اترك ردًا",
+    "Leave a comment": "اترك تعليقًا"
 }

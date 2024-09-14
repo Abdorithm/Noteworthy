@@ -7,22 +7,15 @@ import { Input } from "~/components/ui/input"
 import { Label } from "~/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs"
-import RedditStyleComments from '~/components/comments';
 import { Separator } from '~/components/ui/separator';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { getUserByEmail, getUserById, getUserByUsername, updateUser } from '~/.server/models/user.model';
-import { getPostsByUsername, getTotalPostsCount } from '~/.server/models/post.model';
-import UserJournal from '~/components/post'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-} from "~/components/ui/pagination";
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Post } from '@prisma/client';
+import { getPostsByUsername } from '~/.server/models/post.model';
+import UserJournal from '~/components/post';
+import UserComment from '~/components/comment';
+import { Post, Comment } from '@prisma/client';
+import { getCommentsByUsername } from '~/.server/models/comment.model';
 
 
 const registerSchema = z.object({
@@ -34,15 +27,11 @@ const registerSchema = z.object({
 
 export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) => {
   const user = await requireUser(request);
-  const url = new URL(request.url);
-  const page = parseInt(url.searchParams.get('page') || '1', 10);
-  const limit = parseInt(url.searchParams.get('limit') || '10', 10);
-  const offset = (page - 1) * limit;
 
-  const posts = await getPostsByUsername(user.username, { offset, limit });
-  const totalPosts = await getTotalPostsCount();
+  const posts = await getPostsByUsername(user.username);
+  const comments = await getCommentsByUsername(user.username);
 
-  return json({ user, posts, page, totalPosts, limit });
+  return json({ user, posts, comments });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -156,60 +145,7 @@ export default function Account() {
     setIsEditing(!isEditing);
   };
 
-  // Below is the same as the one in app/routes/_home.feed.tsx
-  // which is the pagination logic
-  // The only difference is the data being passed to the UserJournal component
   const [searchParams, setSearchParams] = useSearchParams();
-
-  const handlePageChange = (newPage: number) => {
-    searchParams.set('page', newPage.toString());
-    setSearchParams(searchParams);
-  };
-
-  const renderPageNumbers = () => {
-    const pageNumbers = [];
-    const showEllipsisStart = data.page > 3;
-    const showEllipsisEnd = data.page < totalPages - 2;
-
-    if (showEllipsisStart) {
-      pageNumbers.push(
-        <PaginationItem key="start">
-          <PaginationLink onClick={() => handlePageChange(1)}>1</PaginationLink>
-        </PaginationItem>,
-        <PaginationItem key="ellipsis-start">
-          <PaginationEllipsis />
-        </PaginationItem>
-      );
-    }
-
-    for (let i = Math.max(1, data.page - 1); i <= Math.min(totalPages, data.page + 1); i++) {
-      pageNumbers.push(
-        <PaginationItem key={i}>
-          <PaginationLink
-            isActive={i === data.page}
-            onClick={() => handlePageChange(i)}
-          >
-            {i}
-          </PaginationLink>
-        </PaginationItem>
-      );
-    }
-
-    if (showEllipsisEnd) {
-      pageNumbers.push(
-        <PaginationItem key="ellipsis-end">
-          <PaginationEllipsis />
-        </PaginationItem>,
-        <PaginationItem key="end">
-          <PaginationLink onClick={() => handlePageChange(totalPages)}>{totalPages}</PaginationLink>
-        </PaginationItem>
-      );
-    }
-
-    return pageNumbers;
-  };
-
-  const totalPages = Math.ceil(data.totalPosts / data.limit);
 
   return (
     <div className="container mx-auto p-4">
@@ -325,46 +261,33 @@ export default function Account() {
         </TabsList>
         <TabsContent value="posts">
           <div className="my-4 w-full max-w-2xl mx-auto space-y-0 divide-y divide-gray-200 dark:divide-gray-800">
-            {data.posts.map((post: Pick<Post, "id" | "title" | "content" | "ownerHandle">) => (
+            {data.posts.map((post: Pick<Post, "id" | "title" | "content" | "ownerHandle" | "commentCount">) => (
               <UserJournal
                 key={post.id}
+                id={post.id}
                 title={post.title}
                 content={post.content}
                 username={post.ownerHandle}
-                commentCount={0}
+                commentCount={post.commentCount}
               />
             ))}
           </div>
-          <Pagination className="mb-4">
-            <PaginationContent>
-              <PaginationItem>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handlePageChange(data.page - 1)}
-                  disabled={data.page <= 1}
-                  aria-label={t("Previous page")}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-              </PaginationItem>
-              {renderPageNumbers()}
-              <PaginationItem>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handlePageChange(data.page + 1)}
-                  disabled={data.page >= totalPages}
-                  aria-label={t("Next page")}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
         </TabsContent>
         <TabsContent value="comments">
-          <RedditStyleComments />
+          <div className="my-4 w-full max-w-2xl mx-auto space-y-0 divide-y divide-gray-200 dark:divide-gray-800">
+            {data.comments.map((comment: Omit<Comment, "createdAt" | "updatedAt">) => (
+              <UserComment
+                key={comment.id}
+                id={comment.id}
+                username={comment.ownerHandle}
+                parentUsername={comment.parentHandle}
+                parentId={comment.parentId}
+                postId={comment.postId}
+                content={comment.content}
+                commentCount={comment.commentCount}
+              />
+            ))}
+          </div>
         </TabsContent>
       </Tabs>
     </div>

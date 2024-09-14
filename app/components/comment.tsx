@@ -4,18 +4,20 @@ import { MessageCircle } from "lucide-react"
 import { useState } from "react";
 import { Link } from "@remix-run/react";
 
-export default function UserJournal({
+export default function UserComment({
   id = "0",
-  title = "Untitled",
+  parentId = "0", // id of the parent comment
   content = "No content",
-  username = "Anonymous",
+  username = "Anonymous", // username of the current comment author
+  postId = "0",
   commentCount = 0,
   maxLength = 100,
 }: {
   id?: string;
-  title?: string;
+  parentId?: string | null;
   content?: string;
   username?: string;
+  postId? : string;
   commentCount?: number;
   maxLength?: number;
 }) {
@@ -31,10 +33,23 @@ export default function UserJournal({
   return (
     <Card className="w-full max-w-2xl border-y border-l-0 border-r-0 rounded-none">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-bold  text-muted-foreground">@{username}</CardTitle>
+        <CardTitle className="text-sm font-medium text-muted-foreground">
+            <span className="font-bold">
+            @{username}
+            </span>
+          &apos;s&nbsp;reply to&nbsp;
+          {parentId === null ? (
+            <Link to={`/journal/${postId}`} className="text-rose-600 hover:underline">
+              this post
+            </Link>
+          ) : (
+            <Link to={`/reply/${parentId}`} className="text-rose-600 hover:underline">
+              this reply
+            </Link>
+          )}
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        <h2 className="text-lg font-semibold mb-2">{title}</h2>
         <div
           className="text-sm text-gray-500 dark:text-gray-400 whitespace-break-spaces break-words max-w-full"
           style={{ overflowWrap: 'break-word', wordBreak: 'break-word' }}
@@ -49,7 +64,7 @@ export default function UserJournal({
         )}
       </CardContent>
       <CardFooter>
-        <Link to={`/journal/${id}`}>
+        <Link to={`/reply/${id}`}>
           <Button
             variant="ghost"
             size="sm"

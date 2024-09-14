@@ -7,32 +7,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
 import { Textarea } from '~/components/ui/textarea';
 import { knownUser } from '~/gaurds.server';
-import SocialMediaPost from '~/components/post'
+import UserJournal from '~/components/post'
 import React, { useState } from 'react';
-import { createPost, getPosts, getTotalPostsCount } from '~/.server/models/post.model';
+import { createPost, getPosts } from '~/.server/models/post.model';
 import { Post } from '@prisma/client';
 
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-} from "~/components/ui/pagination";
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-
-
 export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) => {
-  const url = new URL(request.url);
-  const page = parseInt(url.searchParams.get('page') || '1', 10);
-  const limit = parseInt(url.searchParams.get('limit') || '10', 10);
-  const offset = (page - 1) * limit;
-
   const user = await knownUser(request);
-  const posts = await getPosts({ offset, limit });
-  const totalPosts = await getTotalPostsCount();
+  const posts = await getPosts();
 
-  return json({ user, posts, page, totalPosts, limit });
+  return json({ user, posts });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -68,56 +52,6 @@ export default function Feed() {
       setCharCount(e.target.value.length)
     }
   };
-
-  const handlePageChange = (newPage: number) => {
-    searchParams.set('page', newPage.toString());
-    setSearchParams(searchParams);
-  };
-
-  const renderPageNumbers = () => {
-    const pageNumbers = [];
-    const showEllipsisStart = data.page > 3;
-    const showEllipsisEnd = data.page < totalPages - 2;
-
-    if (showEllipsisStart) {
-      pageNumbers.push(
-        <PaginationItem key="start">
-          <PaginationLink onClick={() => handlePageChange(1)}>1</PaginationLink>
-        </PaginationItem>,
-        <PaginationItem key="ellipsis-start">
-          <PaginationEllipsis />
-        </PaginationItem>
-      );
-    }
-
-    for (let i = Math.max(1, data.page - 1); i <= Math.min(totalPages, data.page + 1); i++) {
-      pageNumbers.push(
-        <PaginationItem key={i}>
-          <PaginationLink
-            isActive={i === data.page}
-            onClick={() => handlePageChange(i)}
-          >
-            {i}
-          </PaginationLink>
-        </PaginationItem>
-      );
-    }
-
-    if (showEllipsisEnd) {
-      pageNumbers.push(
-        <PaginationItem key="ellipsis-end">
-          <PaginationEllipsis />
-        </PaginationItem>,
-        <PaginationItem key="end">
-          <PaginationLink onClick={() => handlePageChange(totalPages)}>{totalPages}</PaginationLink>
-        </PaginationItem>
-      );
-    }
-
-    return pageNumbers;
-  };
-
-  const totalPages = Math.ceil(data.totalPosts / data.limit);
 
   return (
     <div>
@@ -169,43 +103,17 @@ export default function Feed() {
         </div>
       )}
       <div className="my-4 w-full max-w-2xl mx-auto space-y-0 divide-y divide-gray-200 dark:divide-gray-800">
-        {data.posts.map((post: Pick<Post, "id" | "title" | "content" | "ownerHandle">) => (
-          <SocialMediaPost
+        {data.posts.map((post: Pick<Post, "id" | "title" | "content" | "ownerHandle" | "commentCount">) => (
+          <UserJournal
             key={post.id}
+            id={post.id}
             title={post.title}
             content={post.content}
             username={post.ownerHandle}
-            commentCount={0}
+            commentCount={post.commentCount}
           />
         ))}
       </div>
-      <Pagination className="mb-4">
-        <PaginationContent>
-          <PaginationItem>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => handlePageChange(data.page - 1)}
-              disabled={data.page <= 1}
-              aria-label={t("Previous page")}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-          </PaginationItem>
-          {renderPageNumbers()}
-          <PaginationItem>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => handlePageChange(data.page + 1)}
-              disabled={data.page >= totalPages}
-              aria-label={t("Next page")}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
     </div>
   );
 }

@@ -7,16 +7,20 @@ export const createPost = async (post: Pick<Post, "title" | "content" | "ownerHa
     });
 }
 
-export const getPosts = async ({ offset, limit }: { offset: number, limit: number }) => {
+export const getPost = async (postId: string) => {
+    return prisma.post.findUnique({
+        where: { id: postId },
+    });
+};
+
+export const getPosts = async () => {
     return prisma.post.findMany({
-        skip: offset,
-        take: limit,
         orderBy: { createdAt: 'desc' },
     });
 };
 
-export const getPostsByUsername = async (username: string, { offset, limit }: { offset: number, limit: number }) => {
-    const posts = await getPosts({ offset, limit });
+export const getPostsByUsername = async (username: string) => {
+    const posts = await getPosts();
     return posts.filter(post => post.ownerHandle === username);
 };
 

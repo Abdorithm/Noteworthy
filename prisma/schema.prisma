@@ -19,6 +19,7 @@ model Post {
   content       String
   title         String
   favorite      Boolean
+  commentCount  Int       @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt @default(now())
 
@@ -29,8 +30,10 @@ model Post {
 
 model Comment {
   id            String    @id @default(uuid())
+  content       String
   parentId      String?
   ownerHandle   String
+  commentCount  Int       @default(0)
   postId        String
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt @default(now())
