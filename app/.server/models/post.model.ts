@@ -8,20 +8,51 @@ export const createPost = async (post: Pick<Post, "title" | "content" | "ownerHa
 }
 
 export const getPost = async (postId: string) => {
-    return prisma.post.findUnique({
+    const post = await prisma.post.findUnique({
         where: { id: postId },
+        include: {
+            _count: {
+                select: { comments: true },
+            },
+        },
     });
+
+    return {
+        ...post,
+        commentCount: post?._count?.comments ?? 0,
+    };
 };
 
 export const getPosts = async () => {
-    return prisma.post.findMany({
+    const posts = await prisma.post.findMany({
         orderBy: { createdAt: 'desc' },
+        include: {
+            _count: {
+                select: { comments: true },
+            },
+        },
     });
+
+    return posts.map(post => ({
+        ...post,
+        commentCount: post?._count?.comments ?? 0,
+    }));
 };
 
 export const getPostsByUsername = async (username: string) => {
-    const posts = await getPosts();
-    return posts.filter(post => post.ownerHandle === username);
+    const posts = await prisma.post.findMany({
+        where: { ownerHandle: username },
+        include: {
+            _count: {
+                select: { comments: true },
+            },
+        },
+    });
+
+    return posts.map(post => ({
+        ...post,
+        commentCount: post?._count?.comments ?? 0,
+    }));
 };
 
 export const getTotalPostsCount = async () => {

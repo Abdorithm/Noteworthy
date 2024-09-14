@@ -42,7 +42,7 @@ model Comment {
   user          User      @relation(fields: [ownerHandle], references: [username])
   post          Post      @relation(fields: [postId], references: [id])
 
-  Comment       Comment[] @relation("ChildComments")
+  replies       Comment[] @relation("ChildComments")
 }
 
 model User {

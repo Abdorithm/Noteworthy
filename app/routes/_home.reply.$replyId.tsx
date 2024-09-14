@@ -8,7 +8,6 @@ import UserComment from "~/components/comment";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
-import { Separator } from "~/components/ui/separator";
 import { Textarea } from "~/components/ui/textarea";
 import { knownUser } from "~/gaurds.server";
 import { Comment } from "@prisma/client";
@@ -63,7 +62,7 @@ export default function CommentPage() {
       />
       {data.user && (
         <div className="w-full max-w-2xl mx-auto divide-y divide-gray-200 dark:divide-gray-800">
-          <Card className="my-4 rounded-none border-y border-l-0 border-r-0">
+          <Card className="mt-4 rounded-none border-y border-l-0 border-r-0">
             <VisuallyHidden.Root>
               <CardHeader>
                 <CardTitle>
@@ -99,7 +98,10 @@ export default function CommentPage() {
           </Card>
         </div>
       )}
-      <Separator className="max-w-2xl mx-auto" />
+      {data.comments.length > 0 &&
+        <div className="flex items-center justify-center py-2 font-semibold text-muted-foreground">
+          {t("Replies to this reply")}
+        </div>}
       {data.comments.length > 0 ? data.comments.map((comment: Omit<Comment, "createdAt" | "updatedAt">) => (
         <UserComment
           key={comment.id}
@@ -110,7 +112,9 @@ export default function CommentPage() {
           content={comment.content}
           commentCount={comment.commentCount}
         />
-      )) : <div className="flex items-center justify-center pt-2">{t("No replies yet")}</div>}
+      )) : <div className="flex items-center justify-center pt-2 font-semibold text-muted-foreground">
+        {t("No replies yet")}
+      </div>}
     </div>
   );
 }

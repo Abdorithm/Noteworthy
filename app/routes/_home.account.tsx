@@ -257,11 +257,11 @@ export default function Account() {
       <Tabs defaultValue="posts" className="w-full">
         <TabsList className="grid w-full grid-cols-2 max-w-2xl mx-auto mb-4">
           <TabsTrigger value="posts">{t("My journals")}</TabsTrigger>
-          <TabsTrigger value="comments">{t("My comments")}</TabsTrigger>
+          <TabsTrigger value="comments">{t("My replies")}</TabsTrigger>
         </TabsList>
         <TabsContent value="posts">
           <div className="my-4 w-full max-w-2xl mx-auto space-y-0 divide-y divide-gray-200 dark:divide-gray-800">
-            {data.posts.map((post: Pick<Post, "id" | "title" | "content" | "ownerHandle" | "commentCount">) => (
+            {data.posts.length ? data.posts.map((post: Pick<Post, "id" | "title" | "content" | "ownerHandle" | "commentCount">) => (
               <UserJournal
                 key={post.id}
                 id={post.id}
@@ -270,23 +270,24 @@ export default function Account() {
                 username={post.ownerHandle}
                 commentCount={post.commentCount}
               />
-            ))}
+            )) : <div className="flex items-center justify-center pt-2 font-semibold text-muted-foreground">{t("No journals yet")}</div>}
           </div>
         </TabsContent>
         <TabsContent value="comments">
           <div className="my-4 w-full max-w-2xl mx-auto space-y-0 divide-y divide-gray-200 dark:divide-gray-800">
-            {data.comments.map((comment: Omit<Comment, "createdAt" | "updatedAt">) => (
+            {data.comments.length > 0 ?data.comments.map((comment: Omit<Comment, "createdAt" | "updatedAt">) => (
               <UserComment
                 key={comment.id}
                 id={comment.id}
                 username={comment.ownerHandle}
-                parentUsername={comment.parentHandle}
                 parentId={comment.parentId}
                 postId={comment.postId}
                 content={comment.content}
                 commentCount={comment.commentCount}
               />
-            ))}
+            )) : <div className="flex items-center justify-center pt-2 font-semibold text-muted-foreground">
+              {t("No replies yet")}
+            </div>}
           </div>
         </TabsContent>
       </Tabs>

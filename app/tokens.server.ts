@@ -12,10 +12,10 @@ export const sendMagicToken = async (userId: string) => {
   const token = await createMagicToken(userId, 3); // 3 minutes expiration
 
   const emailContent = `
-		<p>Hello from Noteworthy,</p>
-		<p>Here is your magic token: ${token.id}</p>
-		<p>This token will expire in 3 minutes.</p>
-	`;
+    <h1>Hello from Noteworthy,</h1>
+    <h3>Here is your 🔮 magic token 🔮: <strong>${token.id}</strong></h3>
+    <h3>This token will expire in 3 minutes. Needless to say, don't share it.</h3>
+  `;
 
-  return await sendEmail(user.email, 'Your Magic Token', emailContent);
+  return await sendEmail(user.email, 'Your Magic Token - Noteworthy', emailContent);
 };

@@ -1,4 +1,4 @@
-import { Link } from "@remix-run/react";
+import { Link, useNavigation } from "@remix-run/react";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "~/components/languageSwitcher";
 import { ModeToggle } from "~/components/mode-toggle";
@@ -6,6 +6,12 @@ import { Button } from "~/components/ui/button"
 
 export default function Index() {
   const { t } = useTranslation();
+  const navigation = useNavigation();
+  const isFeed = navigation?.location?.pathname === "/feed";
+  const isRegister = navigation?.location?.pathname === "/register";
+  const isLogin = navigation?.location?.pathname === "/login";
+  const isRedirect = navigation?.location?.pathname === "/account";
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4">
       <h1 className="text-4xl font-bold mb-4">Noteworthy</h1>
@@ -16,13 +22,19 @@ export default function Index() {
       </p>
       <div className="mb-2">
         <Link to="/feed">
-          <Button variant="outline" className="m-2">{t("Feed")}</Button>
+          <Button variant="outline" className="m-2">
+            { isFeed ? t("Loading feed...") : t("Feed") }
+          </Button>
         </Link>
         <Link to="/register">
-          <Button variant="default" className="m-2">{t("Sign up")}</Button>
+          <Button variant="default" className="m-2">
+            { isRegister ? t("Loading...") : t("Sign up") }
+          </Button>
         </Link>
         <Link to="/login">
-          <Button variant="outline" className="m-2">{t("Log in")}</Button>
+          <Button variant="outline" className="m-2">
+            { isLogin ? t("Loading...") : isRedirect ? t("Redirecting...") : t("Log in") }
+          </Button>
         </Link>
       </div>
       <div className="mb-2">

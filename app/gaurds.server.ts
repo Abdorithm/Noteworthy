@@ -17,7 +17,7 @@ export const requireUser = async (requset: Request) => {
 export const requireAnon = async (requset: Request) => {
     const userId = await getUserIdFromSession(requset);
     if(userId) {
-        throw redirect('/feed');
+        throw redirect('/account');
     }
 }
 

@@ -103,7 +103,7 @@ export default function Feed() {
         </div>
       )}
       <div className="my-4 w-full max-w-2xl mx-auto space-y-0 divide-y divide-gray-200 dark:divide-gray-800">
-        {data.posts.map((post: Pick<Post, "id" | "title" | "content" | "ownerHandle" | "commentCount">) => (
+        {data.posts.length > 0 ? data.posts.map((post: Pick<Post, "id" | "title" | "content" | "ownerHandle" | "commentCount">) => (
           <UserJournal
             key={post.id}
             id={post.id}
@@ -112,7 +112,9 @@ export default function Feed() {
             username={post.ownerHandle}
             commentCount={post.commentCount}
           />
-        ))}
+        )) : <div className="flex items-center justify-center pt-2 font-semibold text-muted-foreground">
+          {t("No journals yet")}
+        </div>}
       </div>
     </div>
   );

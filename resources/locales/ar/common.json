@@ -39,7 +39,7 @@
     "Edit": "تعديل",
     "Cancel": "إلغاء",
     "Save changes": "حفظ التغييرات",
-    "My comments": "تعليقاتي",
+    "My replies": "ردودي",
     "My journals": "مذكراتي",
     "Requesting token..." : "جاري طلب الرمز...",
     "Creating account..." : "جاري إنشاء الحساب...",
@@ -56,5 +56,9 @@
     "Reply": "رد",
     "Replying..." : "جاري الرد...",
     "Leave a reply": "اترك ردًا",
-    "Leave a comment": "اترك تعليقًا"
+    "Leave a comment": "اترك تعليقًا",
+    "No journals yet": "لا توجد مذكرات بعد",
+    "No replies yet": "لا توجد ردود بعد",
+    "Replies to this reply": "ردود على هذا الرد",
+    "Replies to this journal": "ردود على هذه المذكرة"
 }
