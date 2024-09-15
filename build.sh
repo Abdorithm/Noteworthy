@@ -1,5 +1,12 @@
 # I run this file on my host VPS to deploy
 
+# Update the repository
+echo "===> Updating repository..."
+echo ""
+git stash
+git checkout main
+git pull
+
 # Store the PID of the existing node process
 NODE_PID=$(pgrep -f node)
 
