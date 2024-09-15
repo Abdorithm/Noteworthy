@@ -12,7 +12,7 @@ export default function UserComment({
   username = "Anonymous", // username of the current comment author
   postId = "0",
   commentCount = 0,
-  createdAt = new Date(),
+  createdAt,
   maxLength = 100,
 }: {
   id?: string;
@@ -33,7 +33,7 @@ export default function UserComment({
   const shouldTruncate = content.length > maxLength;
   const displayContent = isExpanded ? content : content.slice(0, maxLength);
 
-  const formattedDate = format(new Date(createdAt), "MMM d, yyyy hh:mm a");
+  const formattedDate = createdAt ? format(new Date(createdAt), "MMM d, yyyy hh:mm a") : "";
 
   return (
     <Card className="w-full max-w-2xl border-y border-l-0 border-r-0 rounded-none">
