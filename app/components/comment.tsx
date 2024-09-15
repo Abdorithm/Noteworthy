@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "~/components/ui/card"
 import { Button } from "~/components/ui/button"
 import { MessageCircle } from "lucide-react"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@remix-run/react";
 import { format } from "date-fns";
 
@@ -25,6 +25,13 @@ export default function UserComment({
   maxLength?: number;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [formattedDate, setFormattedDate] = useState("");
+
+  useEffect(() => {
+    if (createdAt) {
+      setFormattedDate(format(new Date(createdAt), "MMM d, yyyy hh:mm a"));
+    }
+  }, [createdAt]);
 
   const toggleReadMore = () => {
     setIsExpanded(!isExpanded);
@@ -32,8 +39,6 @@ export default function UserComment({
 
   const shouldTruncate = content.length > maxLength;
   const displayContent = isExpanded ? content : content.slice(0, maxLength);
-
-  const formattedDate = createdAt ? format(new Date(createdAt), "MMM d, yyyy hh:mm a") : "";
 
   return (
     <Card className="w-full max-w-2xl border-y border-l-0 border-r-0 rounded-none">
