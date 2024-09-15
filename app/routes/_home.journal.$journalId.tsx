@@ -60,7 +60,7 @@ export default function Journal() {
         username={post.ownerHandle}
         commentCount={post.commentCount}
       />
-      {data.user && (
+      {data.user ? (
         <div className="w-full max-w-2xl mx-auto divide-y divide-gray-200 dark:divide-gray-800">
           <Card className="mt-4 rounded-none border-y border-l-0 border-r-0">
             <VisuallyHidden.Root>
@@ -96,7 +96,9 @@ export default function Journal() {
             </CardContent>
           </Card>
         </div>
-      )}
+      ) : <div className="flex items-center justify-center py-2 font-semibold text-muted-foreground">
+        {t("Log in or sign up to reply")}
+      </div>}
       {data.comments.length > 0 &&
         <div className="flex items-center justify-center py-2 font-semibold text-muted-foreground">
           {t("Replies to this journal")}

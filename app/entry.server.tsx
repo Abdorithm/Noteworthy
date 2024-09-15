@@ -13,6 +13,9 @@ import Backend from "i18next-fs-backend";
 import i18n from "~/localization/i18n"; // your i18n configuration file
 import { resolve } from "node:path";
 import { resources, returnLanguageIfSupported } from "./localization/resource";
+import { config } from "dotenv";
+
+config();
 
 const ABORT_DELAY = 5000;
 

@@ -55,7 +55,7 @@ export default function Feed() {
 
   return (
     <div>
-      {data.user && (
+      {data.user ? (
         <div className="w-full max-w-2xl mx-auto divide-y divide-gray-200 dark:divide-gray-800">
           <Card className="my-4 rounded-none border-y border-l-0 border-r-0">
             <CardHeader>
@@ -101,7 +101,9 @@ export default function Feed() {
           </Card>
           <Separator className="max-w-2xl mx-auto" />
         </div>
-      )}
+      ) : <div className="flex items-center justify-center py-2 font-semibold text-muted-foreground">
+        {t("Log in or sign up to post a journal")}
+      </div>}
       <div className="my-4 w-full max-w-2xl mx-auto space-y-0 divide-y divide-gray-200 dark:divide-gray-800">
         {data.posts.length > 0 ? data.posts.map((post: Pick<Post, "id" | "title" | "content" | "ownerHandle" | "commentCount">) => (
           <UserJournal
