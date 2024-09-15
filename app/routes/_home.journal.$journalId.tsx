@@ -89,6 +89,7 @@ export default function Journal() {
         content={post.content}
         username={post.ownerHandle}
         commentCount={post.commentCount}
+        createdAt={post.createdAt}
       />
       {data.user ? (
         <div className="w-full max-w-2xl mx-auto divide-y divide-gray-200 dark:divide-gray-800">
@@ -143,7 +144,7 @@ export default function Journal() {
         <div className="flex items-center justify-center py-2 font-semibold text-muted-foreground">
           {t("Replies to this journal")}
         </div>}
-      {data.comments.length > 0 ? data.comments.map((comment: Omit<Comment, "createdAt" | "updatedAt">) => (
+      {data.comments.length > 0 ? data.comments.map((comment: Omit<Comment, "updatedAt">) => (
         <UserComment
           key={comment.id}
           id={comment.id}
@@ -152,6 +153,7 @@ export default function Journal() {
           postId={comment.postId}
           content={comment.content}
           commentCount={comment.commentCount}
+          createdAt={comment.createdAt}
         />
       )) : <div className="flex items-center justify-center pt-2 font-semibold text-muted-foreground">
         {t("No replies yet")}

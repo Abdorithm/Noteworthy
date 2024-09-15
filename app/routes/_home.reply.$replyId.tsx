@@ -87,6 +87,7 @@ export default function CommentPage() {
         postId={currComment.postId}
         parentId={currComment.parentId}
         commentCount={currComment.commentCount}
+        createdAt={currComment.createdAt}
       />
       {data.user ? (
         <div className="w-full max-w-2xl mx-auto divide-y divide-gray-200 dark:divide-gray-800">
@@ -142,7 +143,7 @@ export default function CommentPage() {
         <div className="flex items-center justify-center py-2 font-semibold text-muted-foreground">
           {t("Replies to this reply")}
         </div>}
-      {data.comments.length > 0 ? data.comments.map((comment: Omit<Comment, "createdAt" | "updatedAt">) => (
+      {data.comments.length > 0 ? data.comments.map((comment: Omit<Comment, "updatedAt">) => (
         <UserComment
           key={comment.id}
           id={comment.id}
@@ -151,6 +152,7 @@ export default function CommentPage() {
           postId={comment.postId}
           content={comment.content}
           commentCount={comment.commentCount}
+          createdAt={comment.createdAt}
         />
       )) : <div className="flex items-center justify-center pt-2 font-semibold text-muted-foreground">
         {t("No replies yet")}

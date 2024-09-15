@@ -3,6 +3,7 @@ import { Button } from "~/components/ui/button"
 import { MessageCircle } from "lucide-react"
 import { useState } from "react";
 import { Link } from "@remix-run/react";
+import { format } from "date-fns";
 
 export default function UserComment({
   id = "0",
@@ -11,6 +12,7 @@ export default function UserComment({
   username = "Anonymous", // username of the current comment author
   postId = "0",
   commentCount = 0,
+  createdAt = new Date(),
   maxLength = 100,
 }: {
   id?: string;
@@ -19,6 +21,7 @@ export default function UserComment({
   username?: string;
   postId? : string;
   commentCount?: number;
+  createdAt?: Date;
   maxLength?: number;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -29,6 +32,8 @@ export default function UserComment({
 
   const shouldTruncate = content.length > maxLength;
   const displayContent = isExpanded ? content : content.slice(0, maxLength);
+
+  const formattedDate = format(new Date(createdAt), "MMM d, yyyy hh:mm a");
 
   return (
     <Card className="w-full max-w-2xl border-y border-l-0 border-r-0 rounded-none">
@@ -63,7 +68,7 @@ export default function UserComment({
           </Button>
         )}
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex justify-between items-center">
         <Link to={`/reply/${id}`}>
           <Button
             variant="ghost"
@@ -78,6 +83,9 @@ export default function UserComment({
             </div>
           </Button>
         </Link>
+        <div className="flex items-center font-bold text-sm text-muted-foreground">
+          <span>{formattedDate}</span>
+        </div>
       </CardFooter>
     </Card>
   )

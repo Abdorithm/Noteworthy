@@ -260,7 +260,7 @@ export default function Account() {
         </TabsList>
         <TabsContent value="posts">
           <div className="my-4 w-full max-w-2xl mx-auto space-y-0 divide-y divide-gray-200 dark:divide-gray-800">
-            {data.posts.length ? data.posts.map((post: Pick<Post, "id" | "title" | "content" | "ownerHandle" | "commentCount">) => (
+            {data.posts.length ? data.posts.map((post: Omit<Post, "updatedAt">) => (
               <UserJournal
                 key={post.id}
                 id={post.id}
@@ -268,13 +268,14 @@ export default function Account() {
                 content={post.content}
                 username={post.ownerHandle}
                 commentCount={post.commentCount}
+                createdAt={post.createdAt}
               />
             )) : <div className="flex items-center justify-center pt-2 font-semibold text-muted-foreground">{t("No journals yet")}</div>}
           </div>
         </TabsContent>
         <TabsContent value="comments">
           <div className="my-4 w-full max-w-2xl mx-auto space-y-0 divide-y divide-gray-200 dark:divide-gray-800">
-            {data.comments.length > 0 ? data.comments.map((comment: Omit<Comment, "createdAt" | "updatedAt">) => (
+            {data.comments.length > 0 ? data.comments.map((comment: Omit<Comment, "updatedAt">) => (
               <UserComment
                 key={comment.id}
                 id={comment.id}
@@ -283,6 +284,7 @@ export default function Account() {
                 postId={comment.postId}
                 content={comment.content}
                 commentCount={comment.commentCount}
+                createdAt={comment.createdAt}
               />
             )) : <div className="flex items-center justify-center pt-2 font-semibold text-muted-foreground">
               {t("No replies yet")}
