@@ -57,11 +57,3 @@ export const getUserIdByMagicTokenId = async (tokenId: string) => {
         return null;
     }
 }
-
-export const deleteUserMagicTokens = async (userId: string) => {
-    await prisma.magicToken.deleteMany({
-        where: {
-            userId,
-        },
-    });
-}
