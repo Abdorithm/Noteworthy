@@ -20,10 +20,10 @@ export default function Index() {
         <br />
         {t("Whether you want a personal diary or a platform to share your journey with the world, You're in the right place!")}
       </p>
-      <div className="mb-2">
+      <div className="mb-2 flex justify-center">
         <Link to="/feed">
           <Button variant="outline" className="m-2">
-            { isFeed ? t("Loading feed...") : t("Feed") }
+            { isFeed ? t("Loading...") : t("Feed") }
           </Button>
         </Link>
         <Link to="/register">

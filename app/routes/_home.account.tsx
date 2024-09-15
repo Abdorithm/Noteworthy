@@ -195,12 +195,12 @@ export default function Account() {
                 </div>
               </div>
               {actionData?.errors?.find(error => error.path.includes('firstName')) && (
-                <p className="text-rose-600">
+                <p className="text-rose-600 font-semibold text-sm">
                   {actionData.errors.find(error => error.path.includes('firstName'))?.message}
                 </p>
               )}
               {actionData?.errors?.find(error => error.path.includes('lastName')) && (
-                <p className="text-rose-600">
+                <p className="text-rose-600 font-semibold text-sm">
                   {actionData.errors.find(error => error.path.includes('lastName'))?.message}
                 </p>
               )}
@@ -214,7 +214,7 @@ export default function Account() {
                 />
               </div>
               {actionData?.errors?.find(error => error.path.includes('username')) && (
-                <p className="text-rose-600">
+                <p className="text-rose-600 font-semibold text-sm">
                   {actionData.errors.find(error => error.path.includes('username'))?.message}
                 </p>
               )}
@@ -229,7 +229,7 @@ export default function Account() {
                 />
               </div>
               {actionData?.errors?.find(error => error.path.includes('email')) && (
-                <p className="text-rose-600">
+                <p className="text-rose-600 font-semibold text-sm">
                   {actionData.errors.find(error => error.path.includes('email'))?.message}
                 </p>
               )}
@@ -240,12 +240,12 @@ export default function Account() {
                 </Button>
               </div>
               {actionData?.errors?.find(error => error.path.includes('same-info')) && (
-                <p className="text-rose-600">
+                <p className="text-rose-600 font-semibold text-sm">
                   {actionData.errors.find(error => error.path.includes('same-info'))?.message}
                 </p>
               )}
               {actionData?.errors?.find(error => error.path.includes('success')) && (
-                <p className="text-sky-600">
+                <p className="text-sky-600 font-semibold text-sm">
                   {actionData.errors.find(error => error.path.includes('success'))?.message}
                 </p>
               )}

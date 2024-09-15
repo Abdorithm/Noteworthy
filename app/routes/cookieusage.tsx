@@ -14,7 +14,7 @@ export default function CookieUsage() {
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4">
       <h1 className="text-4xl font-bold mb-4">{t("Noteworthy's Cookie Policy")}</h1>
       <p className="m-2">
         {t("This website uses cookies to ensure you get the best experience.")}

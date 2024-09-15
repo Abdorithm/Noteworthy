@@ -12,6 +12,15 @@ import React, { useState } from 'react';
 import { createPost, getPosts } from '~/.server/models/post.model';
 import { Post } from '@prisma/client';
 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog"
+
 export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) => {
   const user = await knownUser(request);
   const posts = await getPosts();
@@ -57,7 +66,7 @@ export default function Feed() {
     <div>
       {data.user ? (
         <div className="w-full max-w-2xl mx-auto divide-y divide-gray-200 dark:divide-gray-800">
-          <Card className="my-4 rounded-none border-y border-l-0 border-r-0">
+          <Card className="mt-4 rounded-none border-y border-l-0 border-r-0">
             <CardHeader>
               <CardTitle></CardTitle>
               <span className='text-sm'>
@@ -65,38 +74,55 @@ export default function Feed() {
               </span>
             </CardHeader>
             <CardContent>
-              <Form method="post" className="space-y-1">
-                <Input type="hidden" name="intent" value="postingJournal" />
-                <Input type="hidden" name="username" value={data.user.username} />
-                <Input
-                  placeholder="Journal title"
-                  id="title"
-                  name="title"
-                  onChange={handleContentChange}
-                  maxLength={MAX_CHARS_TITLE}
-                  required
-                />
-                <div className="text-sm text-gray-500 text-right">
-                  {charTitleCount}/{MAX_CHARS_TITLE}
-                </div>
-                <Textarea
-                  placeholder="Share your thoughts..."
-                  id="content"
-                  name="content"
-                  rows={3}
-                  onChange={handleContentChange}
-                  maxLength={MAX_CHARS_CONTENT}
-                  required
-                />
-                <div className="text-sm text-gray-500 text-right">
-                  {charCount}/{MAX_CHARS_CONTENT}
-                </div>
-                <div className='flex justify-center'>
-                  <Button type="submit" className="w-1/4">
-                    {isPosting ? t("Posting...") : t("Post")}
-                  </Button>
-                </div>
-              </Form>
+              <div className="flex justify-center">
+                <Dialog>
+                  <DialogTrigger>
+                    <span className='text-rose-600 font-semibold hover:underline'>
+                      {t("Share a journal")}
+                    </span>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>{t("Write a journal")}</DialogTitle>
+                      <DialogDescription>
+                        {t("Share your thoughts with the community")}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <Form method="post" className="space-y-1">
+                      <Input type="hidden" name="intent" value="postingJournal" />
+                      <Input type="hidden" name="username" value={data.user.username} />
+                      <Input
+                        placeholder={t("Journal title")}
+                        id="title"
+                        name="title"
+                        onChange={handleContentChange}
+                        maxLength={MAX_CHARS_TITLE}
+                        required
+                      />
+                      <div className="text-sm text-gray-500 text-right">
+                        {charTitleCount}/{MAX_CHARS_TITLE}
+                      </div>
+                      <Textarea
+                        placeholder={t("Share your thoughts...")}
+                        id="content"
+                        name="content"
+                        rows={3}
+                        onChange={handleContentChange}
+                        maxLength={MAX_CHARS_CONTENT}
+                        required
+                      />
+                      <div className="text-sm text-gray-500 text-right">
+                        {charCount}/{MAX_CHARS_CONTENT}
+                      </div>
+                      <div className='flex justify-center'>
+                        <Button type="submit" className="w-1/4">
+                          {isPosting ? t("Posting...") : t("Post")}
+                        </Button>
+                      </div>
+                    </Form>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </CardContent>
           </Card>
           <Separator className="max-w-2xl mx-auto" />

@@ -106,12 +106,12 @@ export default function Register() {
                 </div>
               </div>
               {actionData?.errors?.find(error => error.path.includes('first-name')) && (
-                <p className="text-rose-600">
+                <p className="text-rose-600 font-semibold text-sm">
                   {actionData.errors.find(error => error.path.includes('first-name'))?.message}
                 </p>
               )}
               {actionData?.errors?.find(error => error.path.includes('last-name')) && (
-                <p className="text-rose-600">
+                <p className="text-rose-600 font-semibold text-sm">
                   {actionData.errors.find(error => error.path.includes('last-name'))?.message}
                 </p>
               )}
@@ -124,7 +124,7 @@ export default function Register() {
                   required
                 />
                 {actionData?.errors?.find(error => error.path.includes('username')) && (
-                  <p className="text-rose-600">
+                  <p className="text-rose-600 font-semibold text-sm">
                     {actionData.errors.find(error => error.path.includes('username'))?.message}
                   </p>
                 )}
@@ -139,7 +139,7 @@ export default function Register() {
                   required
                 />
                 {actionData?.errors?.find(error => error.path.includes('email')) && (
-                  <p className="text-rose-600">
+                  <p className="text-rose-600 font-semibold text-sm">
                     {actionData.errors.find(error => error.path.includes('email'))?.message}
                   </p>
                 )}

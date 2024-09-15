@@ -102,7 +102,7 @@ export default function Login() {
                   required
                 />
                 {actionData?.errors?.find(error => error.path.includes('username-or-email')) && (
-                  <p className="text-rose-600">
+                  <p className="text-rose-600 font-semibold text-sm">
                     {actionData.errors.find(error => error.path.includes('username-or-email'))?.message}
                   </p>
                 )}

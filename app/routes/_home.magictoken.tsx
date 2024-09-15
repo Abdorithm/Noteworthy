@@ -99,7 +99,7 @@ export default function VerifyMagic() {
                 />
               </div>
               {actionData?.errors?.find(error => error.path.includes('magic')) && (
-                <p className="text-rose-600">
+                <p className="text-rose-600 font-semibold text-sm">
                   {actionData.errors.find(error => error.path.includes('magic'))?.message}
                 </p>
               )}

@@ -62,5 +62,15 @@
     "Replies to this reply": "ردود على هذا الرد",
     "Replies to this journal": "ردود على هذه المذكرة",
     "Log in or sign up to reply": "سجل الدخول أو انشئ حساب للرد",
-    "Log in or sign up to post a journal": "سجل الدخول أو انشئ حساب لنشر مذكرة"
+    "Log in or sign up to post a journal": "سجل الدخول أو انشئ حساب لنشر مذكرة",
+    "Write a reply": "اكتب ردًا",
+    "Write your reply": "اكتب ردك",
+    "Share your thoughts with the community": "شارك أفكارك مع المجتمع",
+    "Share a journal": "شارك مذكرة",
+    "Write a journal": "اكتب مذكرة",
+    "Journal title": "عنوان المذكرة",
+    "Share your thoughts..." : "شارك أفكارك...",
+    "Loading..." : "جاري التحميل...",
+    "Redirecting..." : "جاري إعادة التوجيه...",
+    "Reply posted" : "تم نشر الرد"
 }

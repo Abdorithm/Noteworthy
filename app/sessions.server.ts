@@ -13,7 +13,7 @@ const sessionStorage = createCookieSessionStorage({
     secrets: ["NjqhlEguQREYKTT3k83vtg3AxrmKnZ3wcr3t"],
     // Set domain and secure only if in production
     ...(isProduction
-      ? { domain: "abdorithm.tech", secure: true }
+      ? { domain: "noteworthy.abdorithm.tech", secure: true }
       : {}),
   },
 })
@@ -31,7 +31,7 @@ const { commitSession, getSession, destroySession } = createCookieSessionStorage
     secrets: ["8Eg3uKhjq9AxgrT3lgVEYtKaZTwcr3QNk3vt"],
     // Set domain and secure only if in production
     ...(isProduction
-      ? { domain: "abdorithm.tech", secure: true }
+      ? { domain: "noteworthy.abdorithm.tech", secure: true }
       : {}),
   },
 })

@@ -1,11 +1,10 @@
 import { ActionFunctionArgs, json, LoaderFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, useLoaderData, useNavigation } from "@remix-run/react";
+import { Form, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
 import invariant from "tiny-invariant";
 import { createComment, getCommentsByPostId } from "~/.server/models/comment.model";
 import { getPost } from "~/.server/models/post.model";
 import UserJournal from "~/components/post";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { knownUser } from "~/gaurds.server";
@@ -13,7 +12,15 @@ import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import UserComment from "~/components/comment";
 import { Comment } from "@prisma/client";
-import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "~/components/ui/dialog"
 
 export const loader: LoaderFunction = async ({ request, params }: LoaderFunctionArgs) => {
   invariant(params.journalId, "Missing journal param");
@@ -37,11 +44,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     ownerHandle: String(data.username),
     postId: String(data.postId),
   });
-  return null;
+
+  return json(
+    {
+      "message": "success"
+    }
+  );
 };
 
 export default function Journal() {
   const data = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const { post } = data;
   const { t } = useTranslation();
   const navigation = useNavigation();
@@ -62,39 +75,50 @@ export default function Journal() {
       />
       {data.user ? (
         <div className="w-full max-w-2xl mx-auto divide-y divide-gray-200 dark:divide-gray-800">
-          <Card className="mt-4 rounded-none border-y border-l-0 border-r-0">
-            <VisuallyHidden.Root>
-              <CardHeader>
-                <CardTitle>
-                  {t("Leave a comment")}
-                </CardTitle>
-              </CardHeader>
-            </VisuallyHidden.Root>
-            <CardContent className="pb-1 pt-1">
-              <Form method="post" className="space-y-1">
-                <Input type="hidden" name="intent" value="postingComment" />
-                <Input type="hidden" name="username" value={data.user.username} />
-                <Input type="hidden" name="postId" value={post.id} />
-                <Textarea
-                  placeholder="Share your thoughts..."
-                  id="content"
-                  name="content"
-                  rows={1}
-                  onChange={(e) => setCharCount(e.target.value.length)}
-                  maxLength={MAX_CHARS}
-                  required
-                />
-                <div className="text-sm text-gray-500 text-right">
-                  {charCount}/{MAX_CHARS}
-                </div>
-                <div className='flex justify-end'>
-                  <Button type="submit">
-                    {isCommenting ? t("Replying...") : t("Reply")}
-                  </Button>
-                </div>
-              </Form>
-            </CardContent>
-          </Card>
+          <div className="my-2 flex justify-center">
+            <Dialog>
+              <DialogTrigger>
+                <span className='text-rose-600 font-semibold hover:underline'>
+                  {t("Write a reply")}
+                </span>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>{t("Write your reply")}</DialogTitle>
+                  <DialogDescription>
+                    {t("Share your thoughts with the community")}
+                  </DialogDescription>
+                </DialogHeader>
+                <Form method="post" className="space-y-1">
+                  <Input type="hidden" name="intent" value="postingComment" />
+                  <Input type="hidden" name="username" value={data.user.username} />
+                  <Input type="hidden" name="postId" value={post.id} />
+                  <Textarea
+                    placeholder={t("Share your thoughts...")}
+                    id="content"
+                    name="content"
+                    rows={1}
+                    onChange={(e) => setCharCount(e.target.value.length)}
+                    maxLength={MAX_CHARS}
+                    required
+                  />
+                  <div className="text-sm text-gray-500 text-right">
+                    {charCount}/{MAX_CHARS}
+                  </div>
+                  <div className='flex justify-center'>
+                    <Button type="submit">
+                      {isCommenting ? t("Replying...") : t("Reply")}
+                    </Button>
+                  </div>
+                  {actionData?.message === "success" && (
+                    <p className="text-sky-600 font-semibold text-sm">
+                      {t("Reply posted")}
+                    </p>
+                  )}
+                </Form>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       ) : <div className="flex items-center justify-center py-2 font-semibold text-muted-foreground">
         {t("Log in or sign up to reply")}
