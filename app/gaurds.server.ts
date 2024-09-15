@@ -2,8 +2,8 @@ import { redirect } from "@remix-run/node";
 import { getUserIdFromSession } from "./sessions.server"
 import { getUserById } from "./.server/models/user.model";
 
-export const requireUser = async (requset: Request) => {
-    const userId = await getUserIdFromSession(requset);
+export const requireUser = async (request: Request) => {
+    const userId = await getUserIdFromSession(request);
     if(!userId) {
         throw redirect('/login');
     }
@@ -14,15 +14,15 @@ export const requireUser = async (requset: Request) => {
     return user;
 }
 
-export const requireAnon = async (requset: Request) => {
-    const userId = await getUserIdFromSession(requset);
+export const requireAnon = async (request: Request) => {
+    const userId = await getUserIdFromSession(request);
     if(userId) {
         throw redirect('/account');
     }
 }
 
-export const knownUser = async (requset: Request) => {
-    const userId = await getUserIdFromSession(requset);
+export const knownUser = async (request: Request) => {
+    const userId = await getUserIdFromSession(request);
     if(!userId) {
         return null;
     }

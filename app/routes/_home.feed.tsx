@@ -1,14 +1,14 @@
 import { Separator } from '@radix-ui/react-dropdown-menu';
 import { ActionFunctionArgs, json, LoaderFunction, LoaderFunctionArgs } from '@remix-run/node';
-import { Form, useLoaderData, useNavigation, useSearchParams } from '@remix-run/react';
+import { Form, useActionData, useLoaderData, useNavigation, useSearchParams } from '@remix-run/react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
 import { Textarea } from '~/components/ui/textarea';
-import { knownUser } from '~/gaurds.server';
+import { knownUser, requireUser } from '~/gaurds.server';
 import UserJournal from '~/components/post'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createPost, getPosts } from '~/.server/models/post.model';
 import { Post } from '@prisma/client';
 
@@ -31,27 +31,34 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
+  const user = await requireUser(request);
 
   await createPost({
     title: String(data.title),
     content: String(data.content),
-    ownerHandle: String(data.username),
+    ownerHandle: String(user.username),
     favorite: false
   });
-  return null;
+
+  return json(
+    {
+      "message": "success"
+    }
+  );
 };
 
 export default function Feed() {
   const data = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const { t } = useTranslation();
   const navigation = useNavigation();
   const isPosting = navigation.formData?.get('intent') === 'postingJournal';
-
   const [charCount, setCharCount] = useState(0);
   const [charTitleCount, setCharTitleCount] = useState(0);
   const MAX_CHARS_CONTENT = 1500;
   const MAX_CHARS_TITLE = 100;
   const [searchParams, setSearchParams] = useSearchParams();
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement> | React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.name === 'title') {
@@ -62,6 +69,22 @@ export default function Feed() {
     }
   };
 
+  // Function to handle dialog open/close
+  const handleDialogChange = (open: boolean) => {
+    if (!open) {
+      setShowSuccess(false);
+      setCharCount(0);
+      setCharTitleCount(0);
+    }
+  };
+
+  // useEffect hook to set showSuccess when actionData changes
+  useEffect(() => {
+    if (actionData?.message === "success") {
+      setShowSuccess(true);
+    }
+  }, [actionData]);
+  
   return (
     <div>
       {data.user ? (
@@ -75,7 +98,7 @@ export default function Feed() {
             </CardHeader>
             <CardContent>
               <div className="flex justify-center">
-                <Dialog>
+                <Dialog onOpenChange={handleDialogChange}>
                   <DialogTrigger>
                     <span className='text-rose-600 font-semibold hover:underline'>
                       {t("Share a journal")}
@@ -90,7 +113,6 @@ export default function Feed() {
                     </DialogHeader>
                     <Form method="post" className="space-y-1">
                       <Input type="hidden" name="intent" value="postingJournal" />
-                      <Input type="hidden" name="username" value={data.user.username} />
                       <Input
                         placeholder={t("Journal title")}
                         id="title"
@@ -119,6 +141,11 @@ export default function Feed() {
                           {isPosting ? t("Posting...") : t("Post")}
                         </Button>
                       </div>
+                      {showSuccess && (
+                        <p className="text-sky-600 font-semibold text-sm">
+                          {t("Journal posted")}
+                        </p>
+                      )}
                     </Form>
                   </DialogContent>
                 </Dialog>

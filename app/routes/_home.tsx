@@ -4,7 +4,7 @@ import { CircleUser, Menu } from "lucide-react"
 import { LanguageSwitcher } from "~/components/languageSwitcher";
 import { ModeToggle } from "~/components/mode-toggle";
 import { useTranslation } from "react-i18next";
-
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { Button } from "~/components/ui/button"
 import {
   DropdownMenu,
@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu"
-import { Sheet, SheetContent, SheetTrigger } from "~/components/ui/sheet"
+import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "~/components/ui/sheet"
 import { knownUser } from '~/gaurds.server';
 
 
@@ -79,6 +79,14 @@ export default function Home() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left">
+            <VisuallyHidden.Root>
+              <SheetTitle>
+                Navigation Menu
+              </SheetTitle>
+              <SheetDescription>
+                Access various sections of the application
+              </SheetDescription>
+            </VisuallyHidden.Root>
             <nav className="grid gap-6 text-lg font-medium">
               <NavLink to={"/"}>
                 <span className="font-bold">
@@ -113,9 +121,12 @@ export default function Home() {
                   {t("Sign up")}
                 </NavLink>
               )}
-              <ModeToggle />
-              <LanguageSwitcher />
             </nav>
+            <br />
+            <ModeToggle />
+            <br />
+            <br />
+            <LanguageSwitcher />
           </SheetContent>
         </Sheet>
 

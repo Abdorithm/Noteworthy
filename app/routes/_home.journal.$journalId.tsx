@@ -7,9 +7,9 @@ import UserJournal from "~/components/post";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
-import { knownUser } from "~/gaurds.server";
+import { knownUser, requireUser } from "~/gaurds.server";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import UserComment from "~/components/comment";
 import { Comment } from "@prisma/client";
 
@@ -37,11 +37,12 @@ export const loader: LoaderFunction = async ({ request, params }: LoaderFunction
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
+  const user = await requireUser(request);
 
   await createComment({
     content: String(data.content),
     parentId: null, // No parent comment as this is a root comment
-    ownerHandle: String(data.username),
+    ownerHandle: String(user.username),
     postId: String(data.postId),
   });
 
@@ -60,8 +61,24 @@ export default function Journal() {
   const navigation = useNavigation();
   const isCommenting = navigation.formData?.get('intent') === 'postingComment';
 
+  const [showSuccess, setShowSuccess] = useState(false);
   const [charCount, setCharCount] = useState(0);
   const MAX_CHARS = 1500;
+
+  // Function to handle dialog open/close
+  const handleDialogChange = (open: boolean) => {
+    if (!open) {
+      setShowSuccess(false);
+      setCharCount(0);
+    }
+  };
+
+  // useEffect hook to set showSuccess when actionData changes
+  useEffect(() => {
+    if (actionData?.message === "success") {
+      setShowSuccess(true);
+    }
+  }, [actionData]);
 
   return (
     <div className="my-4 w-full max-w-2xl mx-auto space-y-0 divide-y divide-gray-200 dark:divide-gray-800">
@@ -76,7 +93,7 @@ export default function Journal() {
       {data.user ? (
         <div className="w-full max-w-2xl mx-auto divide-y divide-gray-200 dark:divide-gray-800">
           <div className="my-2 flex justify-center">
-            <Dialog>
+            <Dialog onOpenChange={handleDialogChange}>
               <DialogTrigger>
                 <span className='text-rose-600 font-semibold hover:underline'>
                   {t("Write a reply")}
@@ -91,7 +108,6 @@ export default function Journal() {
                 </DialogHeader>
                 <Form method="post" className="space-y-1">
                   <Input type="hidden" name="intent" value="postingComment" />
-                  <Input type="hidden" name="username" value={data.user.username} />
                   <Input type="hidden" name="postId" value={post.id} />
                   <Textarea
                     placeholder={t("Share your thoughts...")}
@@ -110,7 +126,7 @@ export default function Journal() {
                       {isCommenting ? t("Replying...") : t("Reply")}
                     </Button>
                   </div>
-                  {actionData?.message === "success" && (
+                  {showSuccess && (
                     <p className="text-sky-600 font-semibold text-sm">
                       {t("Reply posted")}
                     </p>

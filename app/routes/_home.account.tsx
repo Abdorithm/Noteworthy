@@ -10,7 +10,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs"
 import { Separator } from '~/components/ui/separator';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { getUserByEmail, getUserById, getUserByUsername, updateUser } from '~/.server/models/user.model';
+import { getUserByEmail, getUserByUsername, updateUser } from '~/.server/models/user.model';
 import { getPostsByUsername } from '~/.server/models/post.model';
 import UserJournal from '~/components/post';
 import UserComment from '~/components/comment';
@@ -37,6 +37,7 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
+  const user = await requireUser(request);
 
   // client-side validation
   try {
@@ -48,12 +49,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 
   // server-side validation
-  // we required the user in the loader so this can't be null
-  const originalUser = await getUserById(String(data.id));
-
-  if (String(data.email) === String(originalUser!.email) && String(data.username) === String(originalUser!.username)
-    && String(data['firstName']) === String(originalUser!.firstName)
-    && String(data['lastName']) === String(originalUser!.lastName)) {
+  if (String(data.email) === String(user.email) && String(data.username) === String(user.username)
+    && String(data['firstName']) === String(user.firstName)
+    && String(data['lastName']) === String(user.lastName)) {
+    // if user submitted the form with no changes
     return json(
       {
         "errors": [
@@ -68,7 +67,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     );
   }
   else if (await getUserByEmail(String(data.email))
-    && String(originalUser!.email) !== String(data.email)) {
+    && String(user.email) !== String(data.email)) {
+    // if user submitted the form with an existing email
     return json(
       {
         "errors": [
@@ -83,7 +83,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     );
   }
   else if (await getUserByUsername(String(data.username))
-    && String(originalUser!.username) !== String(data.username)) {
+    && String(user.username) !== String(data.username)) {
+    // if user submitted the form with an existing username
     return json(
       {
         "errors": [
@@ -98,7 +99,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     );
   }
   else {
-    await updateUser(String(originalUser!.id), {
+    await updateUser(String(user.id), {
       firstName: String(data['firstName']),
       lastName: String(data['lastName']),
       username: String(data.username),
@@ -107,6 +108,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     });
   }
 
+  // success. pardon my french. still working on my typing skills
+  // but i was too lazy to type the return value of this action function
+  // so it does not have to be named "errors" 
   return json(
     {
       "errors": [
@@ -177,11 +181,6 @@ export default function Account() {
                     name="firstName"
                     defaultValue={controlledUser.firstName}
                     onChange={handleInputChange}
-                  />
-                  <Input
-                    type="hidden"
-                    name="id"
-                    defaultValue={data.user.id}
                   />
                 </div>
                 <div className="space-y-2">
@@ -275,7 +274,7 @@ export default function Account() {
         </TabsContent>
         <TabsContent value="comments">
           <div className="my-4 w-full max-w-2xl mx-auto space-y-0 divide-y divide-gray-200 dark:divide-gray-800">
-            {data.comments.length > 0 ?data.comments.map((comment: Omit<Comment, "createdAt" | "updatedAt">) => (
+            {data.comments.length > 0 ? data.comments.map((comment: Omit<Comment, "createdAt" | "updatedAt">) => (
               <UserComment
                 key={comment.id}
                 id={comment.id}

@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, json, LoaderFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { Form, useLoaderData, useNavigation } from "@remix-run/react";
-import { useState } from "react";
+import { Form, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import invariant from "tiny-invariant";
 import { createComment, getChildComments, getComment } from "~/.server/models/comment.model";
@@ -8,7 +8,7 @@ import UserComment from "~/components/comment";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
-import { knownUser } from "~/gaurds.server";
+import { knownUser, requireUser } from "~/gaurds.server";
 import { Comment } from "@prisma/client";
 
 import {
@@ -35,26 +35,47 @@ export const loader: LoaderFunction = async ({ request, params }: LoaderFunction
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
+  const user = await requireUser(request);
 
   await createComment({
     content: String(data.content),
     parentId: String(data.parentId),
-    ownerHandle: String(data.username),
+    ownerHandle: String(user.username),
     postId: String(data.postId),
   });
 
-  return null;
+  return json(
+    {
+      "message": "success"
+    }
+  );
 };
 
 export default function CommentPage() {
   const data = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const { currComment } = data;
   const { t } = useTranslation();
   const navigation = useNavigation();
   const isReplying = navigation.formData?.get('intent') === 'postingReply';
-
+  const [showSuccess, setShowSuccess] = useState(false);
   const [charCount, setCharCount] = useState(0);
   const MAX_CHARS = 1500;
+
+  // Function to handle dialog open/close
+  const handleDialogChange = (open: boolean) => {
+    if (!open) {
+      setShowSuccess(false);
+      setCharCount(0);
+    }
+  };
+
+  // useEffect hook to set showSuccess when actionData changes
+  useEffect(() => {
+    if (actionData?.message === "success") {
+      setShowSuccess(true);
+    }
+  }, [actionData]);
 
   return (
     <div className="my-4 w-full max-w-2xl mx-auto space-y-0 divide-y divide-gray-200 dark:divide-gray-800">
@@ -70,7 +91,7 @@ export default function CommentPage() {
       {data.user ? (
         <div className="w-full max-w-2xl mx-auto divide-y divide-gray-200 dark:divide-gray-800">
           <div className="my-2 flex justify-center">
-            <Dialog>
+            <Dialog onOpenChange={handleDialogChange}>
               <DialogTrigger>
                 <span className='text-rose-600 font-semibold hover:underline'>
                   {t("Write a reply")}
@@ -85,7 +106,6 @@ export default function CommentPage() {
                 </DialogHeader>
                 <Form method="post" className="space-y-1">
                   <Input type="hidden" name="intent" value="postingReply" />
-                  <Input type="hidden" name="username" value={data.user.username} />
                   <Input type="hidden" name="postId" value={currComment.postId} />
                   <Input type="hidden" name="parentId" value={currComment.id} />
                   <Textarea
@@ -105,6 +125,11 @@ export default function CommentPage() {
                       {isReplying ? t("Replying...") : t("Reply")}
                     </Button>
                   </div>
+                  {showSuccess && (
+                    <p className="text-sky-600 font-semibold text-sm">
+                      {t("Reply posted")}
+                    </p>
+                  )}
                 </Form>
               </DialogContent>
             </Dialog>
