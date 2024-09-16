@@ -26,10 +26,24 @@ export const getComment = async (commentId: string) => {
 }
 
 // Function to get child comments for a given parent comment ID
-export const getChildComments = async (parentId: string) => {
+export const getChildComments = async (parentId: string, cursor: { createdAt: string, id: string } | null, pageSize: number) => {
     const comments = await prisma.comment.findMany({
-        where: { parentId },
-        orderBy: { createdAt: 'desc' },
+        where: cursor ? {
+            AND: [
+                { parentId },
+                {
+                    OR: [
+                        { createdAt: { lt: new Date(cursor.createdAt) } },
+                        { createdAt: new Date(cursor.createdAt), id: { lt: cursor.id } }
+                    ]
+                }
+            ]
+        } : { parentId },
+        take: pageSize,
+        orderBy: [
+            { createdAt: 'desc' },
+            { id: 'desc' }
+        ],
         include: {
             _count: {
                 select: { replies: true },
@@ -44,10 +58,24 @@ export const getChildComments = async (parentId: string) => {
 }
 
 // Function to get comments by post ID
-export const getCommentsByPostId = async (postId: string) => {
+export const getCommentsByPostId = async (postId: string, cursor: { createdAt: string, id: string } | null, pageSize: number) => {
     const comments = await prisma.comment.findMany({
-        where: { postId, parentId: null },
-        orderBy: { createdAt: 'desc' },
+        where: cursor ? {
+            AND: [
+                { postId, parentId: null },
+                {
+                    OR: [
+                        { createdAt: { lt: new Date(cursor.createdAt) } },
+                        { createdAt: new Date(cursor.createdAt), id: { lt: cursor.id } }
+                    ]
+                }
+            ]
+        } : { postId, parentId: null },
+        take: pageSize,
+        orderBy: [
+            { createdAt: 'desc' },
+            { id: 'desc' }
+        ],
         include: {
             _count: {
                 select: { replies: true },
@@ -61,28 +89,25 @@ export const getCommentsByPostId = async (postId: string) => {
     }));
 }
 
-// Function to get comments
-export const getComments = async () => {
-    const comments = await prisma.comment.findMany({
-        orderBy: { createdAt: 'desc' },
-        include: {
-            _count: {
-                select: { replies: true },
-            },
-        },
-    });
-
-    return comments.map(comment => ({
-        ...comment,
-        commentCount: comment?._count?.replies ?? 0,
-    }));
-};
-
 // Function to get comments by username
-export const getCommentsByUsername = async (username: string) => {
+export const getCommentsByUsername = async (username: string, cursor: { createdAt: string, id: string } | null, pageSize: number) => {
     const comments = await prisma.comment.findMany({
-        where: { ownerHandle: username },
-        orderBy: { createdAt: 'desc' },
+        where: cursor ? {
+            AND: [
+                { ownerHandle: username },
+                {
+                    OR: [
+                        { createdAt: { lt: new Date(cursor.createdAt) } },
+                        { createdAt: new Date(cursor.createdAt), id: { lt: cursor.id } }
+                    ]
+                }
+            ]
+        } : { ownerHandle: username },
+        take: pageSize,
+        orderBy: [
+            { createdAt: 'desc' },
+            { id: 'desc' }
+        ],
         include: {
             _count: {
                 select: { replies: true },
@@ -97,7 +122,29 @@ export const getCommentsByUsername = async (username: string) => {
 };
 
 
-// Function to get the total count of comments
-export const getTotalCommentsCount = async () => {
-    return prisma.comment.count();
-};
+export const commentsCount = async (ownerHandle: string | null, postId: string | null, parentId: string | null) => {
+    if (ownerHandle) {
+        return await prisma.comment.count({
+            where: {
+                ownerHandle
+            },
+        });
+    }
+    else if (postId) {
+        return await prisma.comment.count({
+            where: {
+                postId
+            },
+        });
+    }
+    else if (parentId) {
+        return await prisma.comment.count({
+            where: {
+                parentId
+            },
+        });
+    }
+    else {
+        return await prisma.comment.count();
+    }
+} 

@@ -1,5 +1,5 @@
 import { ActionFunctionArgs, json, LoaderFunction, LoaderFunctionArgs } from '@remix-run/node';
-import { Form, useActionData, useLoaderData, useNavigation, useSearchParams } from '@remix-run/react';
+import { Form, useActionData, useLoaderData, useNavigation } from '@remix-run/react';
 import { requireUser } from '~/gaurds.server';
 import { useState } from 'react'
 import { Button } from "~/components/ui/button"
@@ -27,11 +27,29 @@ const registerSchema = z.object({
 
 export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) => {
   const user = await requireUser(request);
+  const url = new URL(request.url);
 
-  const posts = await getPostsByUsername(user.username);
-  const comments = await getCommentsByUsername(user.username);
+  const journalCursor = url.searchParams.get('journalCursor');
+  const pageSize = 10;
+  const parsedJournalCursor = journalCursor ? JSON.parse(journalCursor) : null;
+  const posts = await getPostsByUsername(user.username, parsedJournalCursor, pageSize);
+  const nextJournalCursor = posts.length === pageSize ? { createdAt: posts[posts.length - 1].createdAt, id: posts[posts.length - 1].id } : null;
 
-  return json({ user, posts, comments });
+  const commentCursor = url.searchParams.get('commentCursor');
+  const parsedCommentCursor = commentCursor ? JSON.parse(commentCursor) : null;
+  const comments = await getCommentsByUsername(user.username, parsedCommentCursor, pageSize);
+  const nextCommentCursor = comments.length === pageSize ? { createdAt: comments[comments.length - 1].createdAt, id: comments[comments.length - 1].id } : null;
+
+
+  return json(
+    {
+      user,
+      initialJournals: posts,
+      initialReplies: comments,
+      initialNextJournalCursor: nextJournalCursor,
+      initialNextReplyCursor: nextCommentCursor,
+    }
+  );
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -127,29 +145,76 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 export default function Account() {
   const data = useLoaderData<typeof loader>();
+  const { initialJournals, initialReplies } = data;
   const actionData = useActionData<typeof action>();
   const { t } = useTranslation();
   const navigation = useNavigation();
   const isSaving = navigation.formData?.get('intent') === 'savingChanges';
 
+  // Handling cursor pagination for journals
+  const [journals, setJournals] = useState<Post[]>(initialJournals);
+  const [nextJournalCursor, setNextJournalCursor] = useState<{ createdAt: Date; id: string } | null>(data.initialNextJournalCursor);
+  const [isLoadingJournals, setIsLoadingJournals] = useState(false);
+
+  // Function to load more journals
+  const handleLoadMoreJournals = async () => {
+    setIsLoadingJournals(true);
+    const url = new URL(`/api/${data.user.username}/journals`, window.location.origin);
+    if (nextJournalCursor) url.searchParams.set('journalCursor', JSON.stringify(nextJournalCursor));
+
+    try {
+      const response = await fetch(url.toString());
+      const data = await response.json();
+      setJournals(prevJournals => [...prevJournals, ...data.posts]);
+      setNextJournalCursor(data.nextCursor);
+    } catch (error) {
+      console.error('Error fetching journals:', error);
+    } finally {
+      setIsLoadingJournals(false);
+    }
+  };
+
+  // Handling cursor pagination for replies
+  const [replies, setReplies] = useState<Comment[]>(initialReplies);
+  const [nextReplyCursor, setNextReplyCursor] = useState<{ createdAt: Date; id: string } | null>(data.initialNextReplyCursor);
+  const [isLoadingReplies, setIsLoadingReplies] = useState(false);
+
+  // Function to load more replies
+  const handleLoadMoreReplies = async () => {
+    setIsLoadingReplies(true);
+    const url = new URL(`/api/${data.user.username}/replies`, window.location.origin);
+    if (nextReplyCursor) url.searchParams.set('commentCursor', JSON.stringify(nextReplyCursor));
+
+    try {
+      const response = await fetch(url.toString());
+      const data = await response.json();
+      setReplies(prevReplies => [...prevReplies, ...data.replies]);
+      setNextReplyCursor(data.nextCursor);
+    } catch (error) {
+      console.error('Error fetching replies:', error);
+    } finally {
+      setIsLoadingReplies(false);
+    }
+  };
+
+
+  // Controlled form state to handle input changes on toggle
   const [controlledUser, setUser] = useState({
     firstName: data.user.firstName,
     lastName: data.user.lastName,
     username: data.user.username,
     email: data.user.email,
   });
+  const [isEditing, setIsEditing] = useState(false);
 
+  // Function to handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUser(prevUser => ({ ...prevUser, [e.target.name]: e.target.value }));
   };
 
-  const [isEditing, setIsEditing] = useState(false);
-
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
   };
-
-  const [searchParams, setSearchParams] = useSearchParams();
 
   return (
     <div className="container mx-auto p-4">
@@ -260,7 +325,7 @@ export default function Account() {
         </TabsList>
         <TabsContent value="posts">
           <div className="my-4 w-full max-w-2xl mx-auto space-y-0 divide-y divide-gray-200 dark:divide-gray-800">
-            {data.posts.length ? data.posts.map((post: Omit<Post, "updatedAt">) => (
+            {journals.length ? journals.map((post: Omit<Post, "updatedAt">) => (
               <UserJournal
                 key={post.id}
                 id={post.id}
@@ -271,11 +336,23 @@ export default function Account() {
                 createdAt={post.createdAt}
               />
             )) : <div className="flex items-center justify-center pt-2 font-semibold text-muted-foreground">{t("No journals yet")}</div>}
+            <div className='flex justify-center'>
+              {nextJournalCursor && (
+                <Button
+                  onClick={handleLoadMoreJournals}
+                  disabled={isLoadingJournals}
+                  className="w-full mt-4"
+                  variant="ghost"
+                >
+                  {isLoadingJournals ? t('Loading...') : t('Load More')}
+                </Button>
+              )}
+            </div>
           </div>
         </TabsContent>
         <TabsContent value="comments">
           <div className="my-4 w-full max-w-2xl mx-auto space-y-0 divide-y divide-gray-200 dark:divide-gray-800">
-            {data.comments.length > 0 ? data.comments.map((comment: Omit<Comment, "updatedAt">) => (
+            {replies.length > 0 ? replies.map((comment: Omit<Comment, "updatedAt">) => (
               <UserComment
                 key={comment.id}
                 id={comment.id}
@@ -289,6 +366,18 @@ export default function Account() {
             )) : <div className="flex items-center justify-center pt-2 font-semibold text-muted-foreground">
               {t("No replies yet")}
             </div>}
+            <div className='flex justify-center'>
+              {nextReplyCursor && (
+                <Button
+                  onClick={handleLoadMoreReplies}
+                  disabled={isLoadingReplies}
+                  className="w-full mt-4"
+                  variant="ghost"
+                >
+                  {isLoadingReplies ? t('Loading...') : t('Load More')}
+                </Button>
+              )}
+            </div>
           </div>
         </TabsContent>
       </Tabs>

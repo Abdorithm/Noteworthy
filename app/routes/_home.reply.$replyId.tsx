@@ -24,12 +24,18 @@ export const loader: LoaderFunction = async ({ request, params }: LoaderFunction
   invariant(params.replyId, "Missing replyId param");
   const currComment = await getComment(params.replyId);
   if (!currComment) {
-    throw new Response("Ops! No comment with this id", { status: 404 });
+    throw new Response("Ops! No reply with this id", { status: 404 });
   }
   const user = await knownUser(request);
-  const comments = await getChildComments(params.replyId);
+  const url = new URL(request.url);
 
-  return json({ currComment, comments, user });
+  const cursor = url.searchParams.get('cursor');
+  const pageSize = 5;
+  const parsedCursor = cursor ? JSON.parse(cursor) : null;
+  const replies = await getChildComments(currComment.id!, parsedCursor, pageSize);
+  const nextCursor = replies.length === pageSize ? { createdAt: replies[replies.length - 1].createdAt, id: replies[replies.length - 1].id } : null;
+
+  return json({ user, currComment, initialReplies: replies, initialNextCursor: nextCursor });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -53,14 +59,39 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 export default function CommentPage() {
   const data = useLoaderData<typeof loader>();
+  const { initialReplies, initialNextCursor } = data;
   const actionData = useActionData<typeof action>();
   const { currComment } = data;
   const { t } = useTranslation();
   const navigation = useNavigation();
+
   const isReplying = navigation.formData?.get('intent') === 'postingReply';
   const [showSuccess, setShowSuccess] = useState(false);
   const [charCount, setCharCount] = useState(0);
   const MAX_CHARS = 1500;
+
+  const [replies, setReplies] = useState<Comment[]>(initialReplies);
+  const [nextCursor, setNextCursor] = useState<{ createdAt: Date; id: string } | null>(initialNextCursor);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Function to load more replies
+  const handleLoadMore = async () => {
+    setIsLoading(true);
+    const url = new URL(`/api/reply/${data.currComment.id}/replies`, window.location.origin);
+    if (nextCursor) url.searchParams.set('cursor', JSON.stringify(nextCursor));
+
+    try {
+      const response = await fetch(url.toString());
+      const data = await response.json();
+      setReplies(prevReplies => [...prevReplies, ...data.replies]);
+      setNextCursor(data.nextCursor);
+    } catch (error) {
+      console.error('Error fetching replies:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
 
   // Function to handle dialog open/close
   const handleDialogChange = (open: boolean) => {
@@ -139,11 +170,11 @@ export default function CommentPage() {
       ) : <div className="flex items-center justify-center py-2 font-semibold text-muted-foreground">
         {t("Log in or sign up to reply")}
       </div>}
-      {data.comments.length > 0 &&
+      {replies.length > 0 &&
         <div className="flex items-center justify-center py-2 font-semibold text-muted-foreground">
           {t("Replies to this reply")}
         </div>}
-      {data.comments.length > 0 ? data.comments.map((comment: Omit<Comment, "updatedAt">) => (
+      {replies.length > 0 ? replies.map((comment: Omit<Comment, "updatedAt">) => (
         <UserComment
           key={comment.id}
           id={comment.id}
@@ -157,6 +188,18 @@ export default function CommentPage() {
       )) : <div className="flex items-center justify-center pt-2 font-semibold text-muted-foreground">
         {t("No replies yet")}
       </div>}
+      <div className='flex justify-center'>
+        {nextCursor && (
+          <Button
+            onClick={handleLoadMore}
+            disabled={isLoading}
+            className="w-full mt-4"
+            variant="ghost"
+          >
+            {isLoading ? t('Loading...') : t('Load More')}
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

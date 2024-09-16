@@ -23,15 +23,21 @@ import {
 } from "~/components/ui/dialog"
 
 export const loader: LoaderFunction = async ({ request, params }: LoaderFunctionArgs) => {
-  invariant(params.journalId, "Missing journal param");
+  invariant(params.journalId, "Missing journalId param");
   const post = await getPost(params.journalId);
   if (!post) {
     throw new Response("Ops! No journal with this id", { status: 404 });
   }
   const user = await knownUser(request);
-  const comments = await getCommentsByPostId(params.journalId);
+  const url = new URL(request.url);
 
-  return json({ post, comments, user });
+  const cursor = url.searchParams.get('cursor');
+  const pageSize = 5;
+  const parsedCursor = cursor ? JSON.parse(cursor) : null;
+  const replies = await getCommentsByPostId(post.id!, parsedCursor, pageSize);
+  const nextCursor = replies.length === pageSize ? { createdAt: replies[replies.length - 1].createdAt, id: replies[replies.length - 1].id } : null;
+
+  return json({ user, journal: post, initialReplies: replies, initialNextCursor: nextCursor });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -55,15 +61,38 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 export default function Journal() {
   const data = useLoaderData<typeof loader>();
+  const { initialReplies, initialNextCursor } = data;
   const actionData = useActionData<typeof action>();
-  const { post } = data;
+  const { journal } = data;
   const { t } = useTranslation();
   const navigation = useNavigation();
-  const isCommenting = navigation.formData?.get('intent') === 'postingComment';
 
+  const isCommenting = navigation.formData?.get('intent') === 'postingComment';
   const [showSuccess, setShowSuccess] = useState(false);
   const [charCount, setCharCount] = useState(0);
   const MAX_CHARS = 1500;
+
+  const [replies, setReplies] = useState<Comment[]>(initialReplies);
+  const [nextCursor, setNextCursor] = useState<{ createdAt: Date; id: string } | null>(initialNextCursor);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Function to load more replies
+  const handleLoadMore = async () => {
+    setIsLoading(true);
+    const url = new URL(`/api/journal/${data.journal.id}/replies`, window.location.origin);
+    if (nextCursor) url.searchParams.set('cursor', JSON.stringify(nextCursor));
+
+    try {
+      const response = await fetch(url.toString());
+      const data = await response.json();
+      setReplies(prevReplies => [...prevReplies, ...data.replies]);
+      setNextCursor(data.nextCursor);
+    } catch (error) {
+      console.error('Error fetching replies:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Function to handle dialog open/close
   const handleDialogChange = (open: boolean) => {
@@ -83,13 +112,13 @@ export default function Journal() {
   return (
     <div className="my-4 w-full max-w-2xl mx-auto space-y-0 divide-y divide-gray-200 dark:divide-gray-800">
       <UserJournal
-        key={post.id}
-        id={post.id}
-        title={post.title}
-        content={post.content}
-        username={post.ownerHandle}
-        commentCount={post.commentCount}
-        createdAt={post.createdAt}
+        key={journal.id}
+        id={journal.id}
+        title={journal.title}
+        content={journal.content}
+        username={journal.ownerHandle}
+        commentCount={journal.commentCount}
+        createdAt={journal.createdAt}
       />
       {data.user ? (
         <div className="w-full max-w-2xl mx-auto divide-y divide-gray-200 dark:divide-gray-800">
@@ -109,7 +138,7 @@ export default function Journal() {
                 </DialogHeader>
                 <Form method="post" className="space-y-1">
                   <Input type="hidden" name="intent" value="postingComment" />
-                  <Input type="hidden" name="postId" value={post.id} />
+                  <Input type="hidden" name="postId" value={journal.id} />
                   <Textarea
                     placeholder={t("Share your thoughts...")}
                     id="content"
@@ -140,11 +169,11 @@ export default function Journal() {
       ) : <div className="flex items-center justify-center py-2 font-semibold text-muted-foreground">
         {t("Log in or sign up to reply")}
       </div>}
-      {data.comments.length > 0 &&
+      {replies.length > 0 &&
         <div className="flex items-center justify-center py-2 font-semibold text-muted-foreground">
           {t("Replies to this journal")}
         </div>}
-      {data.comments.length > 0 ? data.comments.map((comment: Omit<Comment, "updatedAt">) => (
+      {replies.length > 0 ? replies.map((comment: Omit<Comment, "updatedAt">) => (
         <UserComment
           key={comment.id}
           id={comment.id}
@@ -158,6 +187,18 @@ export default function Journal() {
       )) : <div className="flex items-center justify-center pt-2 font-semibold text-muted-foreground">
         {t("No replies yet")}
       </div>}
+      <div className='flex justify-center'>
+        {nextCursor && (
+          <Button
+            onClick={handleLoadMore}
+            disabled={isLoading}
+            className="w-full mt-4"
+            variant="ghost"
+          >
+            {isLoading ? t('Loading...') : t('Load More')}
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

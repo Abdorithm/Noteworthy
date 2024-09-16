@@ -49,9 +49,24 @@ export const getPosts = async (cursor: { createdAt: string, id: string } | null,
     }));
 };
 
-export const getPostsByUsername = async (username: string) => {
+export const getPostsByUsername = async (username: string, cursor: { createdAt: string, id: string } | null, pageSize: number) => {
     const posts = await prisma.post.findMany({
-        where: { ownerHandle: username },
+        where: cursor ? { 
+            AND: [
+                { ownerHandle: username },
+                { 
+                    OR: [
+                        { createdAt: { lt: new Date(cursor.createdAt) } },
+                        { createdAt: new Date(cursor.createdAt), id: { lt: cursor.id } }
+                    ]
+                }
+            ]
+        } : { ownerHandle: username },
+        take: pageSize,
+        orderBy: [
+            { createdAt: 'desc' },
+            { id: 'desc' }
+        ],
         include: {
             _count: {
                 select: { comments: true },
@@ -65,6 +80,15 @@ export const getPostsByUsername = async (username: string) => {
     }));
 };
 
-export const getTotalPostsCount = async () => {
-    return prisma.post.count();
-};
+export const postsCount = async (ownerHandle: string | null) => {
+    if (ownerHandle) {
+        return prisma.post.count({
+            where: { 
+                ownerHandle 
+            },
+        });
+    }
+    else {
+        return prisma.post.count();
+    }
+}
