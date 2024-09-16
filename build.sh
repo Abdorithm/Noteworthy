@@ -14,7 +14,7 @@ NODE_PID=$(lsof -t -i:3000)
 if [ -n "$NODE_PID" ]; then
     echo "===> Killing existing node process with PID: $NODE_PID"
     echo ""
-    sudo kill $NODE_PID
+    kill $NODE_PID
 else
     echo "===> No node process found to kill."
     echo ""

@@ -8,7 +8,7 @@ import { Input } from '~/components/ui/input';
 import { Textarea } from '~/components/ui/textarea';
 import { knownUser, requireUser } from '~/gaurds.server';
 import UserJournal from '~/components/post'
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { createPost, getPosts } from '~/.server/models/post.model';
 import { Post } from '@prisma/client';
 
@@ -23,9 +23,14 @@ import {
 
 export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) => {
   const user = await knownUser(request);
-  const posts = await getPosts();
+  const url = new URL(request.url);
+  const cursor = url.searchParams.get('cursor');
+  const pageSize = 10;
+  const parsedCursor = cursor ? JSON.parse(cursor) : null;
+  const posts = await getPosts(parsedCursor, pageSize);
+  const nextCursor = posts.length === pageSize ? { createdAt: posts[posts.length - 1].createdAt, id: posts[posts.length - 1].id } : null;
 
-  return json({ user, posts });
+  return json({ user, initialPosts: posts, initialNextCursor: nextCursor });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -49,6 +54,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 export default function Feed() {
   const data = useLoaderData<typeof loader>();
+  const initialPosts = data.initialPosts;
+  const initialNextCursor = data.initialNextCursor;
   const actionData = useActionData<typeof action>();
   const { t } = useTranslation();
   const navigation = useNavigation();
@@ -57,15 +64,60 @@ export default function Feed() {
   const [charTitleCount, setCharTitleCount] = useState(0);
   const MAX_CHARS_CONTENT = 1500;
   const MAX_CHARS_TITLE = 100;
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, ] = useSearchParams();
   const [showSuccess, setShowSuccess] = useState(false);
 
+  const [posts, setPosts] = useState<Post[]>(initialPosts);
+  const [nextCursor, setNextCursor] = useState<{ createdAt: Date; id: string } | null>(initialNextCursor);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Function to load more posts
+  const fetchPosts = useCallback(async (cursor?: { createdAt: Date; id: string }) => {
+    setIsLoading(true);
+    const url = new URL('/api/posts', window.location.origin);
+    if (cursor) {
+      url.searchParams.set('cursor', JSON.stringify(cursor));
+    }
+
+    try {
+      const response = await fetch(url.toString());
+      const data = await response.json();
+      if (cursor) {
+        setPosts(prevPosts => [...prevPosts, ...data.posts]);
+      } else {
+        setPosts(data.posts);
+      }
+      setNextCursor(data.nextCursor);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // character count for title and content
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement> | React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.name === 'title') {
       setCharTitleCount(e.target.value.length)
     }
     else if (e.target.name === 'content') {
       setCharCount(e.target.value.length)
+    }
+  };
+
+  useEffect(() => {
+    const cursor = searchParams.get('cursor');
+    if (cursor) {
+      fetchPosts(JSON.parse(cursor));
+    } else {
+      setPosts(initialPosts);
+      setNextCursor(initialNextCursor);
+    }
+  }, [searchParams, initialPosts, initialNextCursor, fetchPosts]);
+
+  const handleLoadMore = () => {
+    if (nextCursor) {
+      fetchPosts(nextCursor);
     }
   };
 
@@ -84,7 +136,7 @@ export default function Feed() {
       setShowSuccess(true);
     }
   }, [actionData]);
-  
+
   return (
     <div>
       {data.user ? (
@@ -158,7 +210,7 @@ export default function Feed() {
         {t("Log in or sign up to post a journal")}
       </div>}
       <div className="my-4 w-full max-w-2xl mx-auto space-y-0 divide-y divide-gray-200 dark:divide-gray-800">
-        {data.posts.length > 0 ? data.posts.map((post: Omit<Post, "updatedAt">) => (
+        {posts.length > 0 ? posts.map((post: Omit<Post, "updatedAt">) => (
           <UserJournal
             key={post.id}
             id={post.id}
@@ -171,6 +223,18 @@ export default function Feed() {
         )) : <div className="flex items-center justify-center pt-2 font-semibold text-muted-foreground">
           {t("No journals yet")}
         </div>}
+        <div className='flex justify-center'>
+          {nextCursor && (
+            <Button
+              onClick={handleLoadMore}
+              disabled={isLoading}
+              className="w-full mt-4"
+              variant="ghost"
+            >
+              {isLoading ? t('Loading...') : t('Load More')}
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

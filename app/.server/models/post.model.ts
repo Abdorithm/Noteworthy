@@ -23,9 +23,19 @@ export const getPost = async (postId: string) => {
     };
 };
 
-export const getPosts = async () => {
+export const getPosts = async (cursor: { createdAt: string, id: string } | null, pageSize: number) => {
     const posts = await prisma.post.findMany({
-        orderBy: { createdAt: 'desc' },
+        where: cursor ? { 
+            OR: [
+                { createdAt: { lt: new Date(cursor.createdAt) } },
+                { createdAt: new Date(cursor.createdAt), id: { lt: cursor.id } }
+            ]
+        } : {},
+        take: pageSize,
+        orderBy: [
+            { createdAt: 'desc' },
+            { id: 'desc' }
+        ],
         include: {
             _count: {
                 select: { comments: true },
