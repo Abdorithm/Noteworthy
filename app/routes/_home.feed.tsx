@@ -39,7 +39,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const data = Object.fromEntries(formData);
   const user = await requireUser(request);
 
-  await createPost({
+  const journal = await createPost({
     title: String(data.title),
     content: String(data.content),
     ownerHandle: String(user.username),
@@ -48,7 +48,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   return json(
     {
-      "message": "success"
+      "message": "success",
+      journal
     }
   );
 };
@@ -87,6 +88,18 @@ export default function Feed() {
       setIsLoading(false);
     }
   };
+
+  // useEffect hook to add new journal to feed
+  useEffect(() => {
+    if (actionData?.message === "success") {
+      const newJournal: Post = {
+        ...actionData.journal,
+        createdAt: new Date(actionData.journal.createdAt),
+        updatedAt: new Date(actionData.journal.updatedAt),
+      };
+      setJournals(prevJournals => [newJournal, ...prevJournals]);
+    }
+  }, [actionData]);
 
   // character count for title and content
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement> | React.ChangeEvent<HTMLInputElement>) => {

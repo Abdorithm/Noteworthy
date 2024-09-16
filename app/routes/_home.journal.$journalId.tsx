@@ -45,7 +45,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const data = Object.fromEntries(formData);
   const user = await requireUser(request);
 
-  await createComment({
+  const reply = await createComment({
     content: String(data.content),
     parentId: null, // No parent comment as this is a root comment
     ownerHandle: String(user.username),
@@ -54,7 +54,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   return json(
     {
-      "message": "success"
+      "message": "success",
+      reply
     }
   );
 };
@@ -93,6 +94,24 @@ export default function Journal() {
       setIsLoading(false);
     }
   };
+
+  // useEffect hook to add new reply to replies
+  useEffect(() => {
+    if (actionData?.message === "success") {
+      const newReply: Comment = {
+        ...actionData.reply,
+        createdAt: new Date(actionData.reply.createdAt),
+        updatedAt: new Date(actionData.reply.updatedAt),
+      };
+      setReplies(prevReplies => [newReply, ...prevReplies]);
+    }
+  }, [actionData]);
+
+  // useEffect hook to reset replies and nextCursor when current journal changes
+  useEffect(() => {
+    setReplies(initialReplies);
+    setNextCursor(initialNextCursor);
+  }, [initialReplies, initialNextCursor, data.journal.id]);
 
   // Function to handle dialog open/close
   const handleDialogChange = (open: boolean) => {
