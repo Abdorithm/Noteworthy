@@ -7,8 +7,8 @@ git stash
 git checkout main
 git pull
 
-# Store the PID of the existing node process
-NODE_PID=$(pgrep -f node)
+# Store the PID of the existing node process running on port 3000
+NODE_PID=$(lsof -t -i:3000)
 
 # Kill the node process
 if [ -n "$NODE_PID" ]; then
