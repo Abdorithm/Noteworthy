@@ -3,26 +3,40 @@ import { prisma } from "../db";
 
 // Function to create a comment
 export const createComment = async (comment: Omit<Comment, "id" | "createdAt" | "updatedAt" | "commentCount">) => {
-    return await prisma.comment.create({
+    const newComment = await prisma.comment.create({
         data: comment,
     });
+
+    let parentId = comment.parentId;
+
+    while (parentId) {
+        await prisma.comment.update({
+            where: { id: parentId },
+            data: {
+                commentCount: {
+                    increment: 1,
+                },
+            },
+        });
+
+        const parentComment = await prisma.comment.findUnique({
+            where: { id: parentId },
+            select: { parentId: true },
+        });
+
+        parentId = parentComment?.parentId || null;
+    }
+
+    return newComment;
 }
 
 // Function to get a comment by its ID
 export const getComment = async (commentId: string) => {
     const comment = await prisma.comment.findUnique({
         where: { id: commentId },
-        include: {
-            _count: {
-                select: { replies: true },
-            },
-        },
     });
 
-    return {
-        ...comment,
-        commentCount: comment?._count?.replies ?? 0,
-    };
+    return comment;
 }
 
 // Function to get child comments for a given parent comment ID
@@ -44,17 +58,9 @@ export const getChildComments = async (parentId: string, cursor: { createdAt: st
             { createdAt: 'desc' },
             { id: 'desc' }
         ],
-        include: {
-            _count: {
-                select: { replies: true },
-            },
-        },
     });
 
-    return comments.map(comment => ({
-        ...comment,
-        commentCount: comment?._count?.replies ?? 0,
-    }));
+    return comments;
 }
 
 // Function to get comments by post ID
@@ -76,17 +82,9 @@ export const getCommentsByPostId = async (postId: string, cursor: { createdAt: s
             { createdAt: 'desc' },
             { id: 'desc' }
         ],
-        include: {
-            _count: {
-                select: { replies: true },
-            },
-        },
     });
 
-    return comments.map(comment => ({
-        ...comment,
-        commentCount: comment?._count?.replies ?? 0,
-    }));
+    return comments;
 }
 
 // Function to get comments by username
@@ -108,17 +106,9 @@ export const getCommentsByUsername = async (username: string, cursor: { createdA
             { createdAt: 'desc' },
             { id: 'desc' }
         ],
-        include: {
-            _count: {
-                select: { replies: true },
-            },
-        },
     });
 
-    return comments.map(comment => ({
-        ...comment,
-        commentCount: comment?._count?.replies ?? 0,
-    }));
+    return comments;
 };
 
 
