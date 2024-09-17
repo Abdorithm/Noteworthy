@@ -1,6 +1,12 @@
 import { createCookieSessionStorage } from "@remix-run/node"
 import { createThemeSessionResolver } from "remix-themes"
 
+// Secret key for the cookie session
+const secret = process.env.COOKIE_SECRET;
+if (!secret) {
+  throw new Error("COOKIE_SECRET environment variable is not set");
+}
+
 // You can default to 'development' if process.env.NODE_ENV is not set
 const isProduction = process.env.NODE_ENV === "production"
 
@@ -10,7 +16,7 @@ const sessionStorage = createCookieSessionStorage({
     path: "/",
     httpOnly: true,
     sameSite: "lax",
-    secrets: ["NjqhlEguQREYKTT3k83vtg3AxrmKnZ3wcr3t"],
+    secrets: [secret],
     // Set domain and secure only if in production
     ...(isProduction
       ? { domain: "noteworthy.abdorithm.tech", secure: true }
@@ -28,7 +34,7 @@ const { commitSession, getSession, destroySession } = createCookieSessionStorage
     maxAge: 60 * 60 * 24 * 30, // 30 days
     httpOnly: true,
     sameSite: "lax",
-    secrets: ["8Eg3uKhjq9AxgrT3lgVEYtKaZTwcr3QNk3vt"],
+    secrets: [secret],
     // Set domain and secure only if in production
     ...(isProduction
       ? { domain: "noteworthy.abdorithm.tech", secure: true }

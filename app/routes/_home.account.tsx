@@ -30,7 +30,7 @@ export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) =>
   const url = new URL(request.url);
 
   const journalCursor = url.searchParams.get('journalCursor');
-  const pageSize = 10;
+  const pageSize = 5;
   const parsedJournalCursor = journalCursor ? JSON.parse(journalCursor) : null;
   const posts = await getPostsByUsername(user.username, parsedJournalCursor, pageSize);
   const nextJournalCursor = posts.length === pageSize ? { createdAt: posts[posts.length - 1].createdAt, id: posts[posts.length - 1].id } : null;

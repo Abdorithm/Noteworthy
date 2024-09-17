@@ -4,7 +4,7 @@ import { getPostsByUsername } from "~/.server/models/post.model";
 export const loader: LoaderFunction = async ({ request }: LoaderFunctionArgs) => {
 	const url = new URL(request.url);
 	const cursor = url.searchParams.get('journalCursor');
-	const pageSize = 10;
+	const pageSize = 5;
 	const parsedCursor = cursor ? JSON.parse(cursor) : null;
 
 	// Extract username from the URL path
