@@ -7,12 +7,11 @@ const prisma = new PrismaClient();
 cron.schedule('*/3 * * * *', async () => {
     try {
         const currentDateTime = new Date(); // Get the current date and time
-        const expirationTime = new Date(currentDateTime.getTime() - 3 * 60000); // Calculate the expiration time (3 minutes ago)
 
         await prisma.magicToken.deleteMany({
             where: {
-                createdAt: {
-                    lte: expirationTime,
+                expiresAt: {
+                    lt: currentDateTime, // Use the expiresAt field to find expired tokens
                 }
             }
         });
