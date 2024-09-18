@@ -179,7 +179,7 @@ export default function Feed() {
                         {charCount}/{MAX_CHARS_CONTENT}
                       </div>
                       <div className='flex justify-center'>
-                        <Button type="submit" className="w-1/4">
+                        <Button type="submit" className="w-1/4" disabled={isPosting}>
                           {isPosting ? t("Posting...") : t("Post")}
                         </Button>
                       </div>

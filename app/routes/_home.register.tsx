@@ -144,7 +144,7 @@ export default function Register() {
                   </p>
                 )}
               </div>
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full" disabled={isCreating}>
                 {isCreating ? t("Creating account...") : t("Create an account")}
               </Button>
             </div>

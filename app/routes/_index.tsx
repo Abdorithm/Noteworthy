@@ -22,17 +22,17 @@ export default function Index() {
       </p>
       <div className="mb-2 flex justify-center">
         <Link to="/feed">
-          <Button variant="outline" className="m-2">
+          <Button variant="outline" className="m-2" disabled={isFeed}>
             { isFeed ? t("Loading...") : t("Feed") }
           </Button>
         </Link>
         <Link to="/register">
-          <Button variant="default" className="m-2">
+          <Button variant="default" className="m-2" disabled={isRegister}>
             { isRegister ? t("Loading...") : t("Sign up") }
           </Button>
         </Link>
         <Link to="/login">
-          <Button variant="outline" className="m-2">
+          <Button variant="outline" className="m-2" disabled={isLogin || isRedirect}>
             { isLogin ? t("Loading...") : isRedirect ? t("Redirecting...") : t("Log in") }
           </Button>
         </Link>

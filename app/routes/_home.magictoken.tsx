@@ -103,7 +103,7 @@ export default function VerifyMagic() {
                   {actionData.errors.find(error => error.path.includes('magic'))?.message}
                 </p>
               )}
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full" disabled={isVerifying}>
                 {isVerifying ? t("Verifying token...") : t("Log in")}
               </Button>
             </div>

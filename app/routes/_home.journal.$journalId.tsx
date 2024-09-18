@@ -171,7 +171,7 @@ export default function Journal() {
                     {charCount}/{MAX_CHARS}
                   </div>
                   <div className='flex justify-center'>
-                    <Button type="submit">
+                    <Button type="submit" disabled={isCommenting}>
                       {isCommenting ? t("Replying...") : t("Reply")}
                     </Button>
                   </div>

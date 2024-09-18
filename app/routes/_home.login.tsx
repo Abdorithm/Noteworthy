@@ -107,7 +107,7 @@ export default function Login() {
                   </p>
                 )}
               </div>
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full" disabled={isRequesting}>
                 {isRequesting ? t("Requesting token...") : t("Request magic token")}
               </Button>
             </div>

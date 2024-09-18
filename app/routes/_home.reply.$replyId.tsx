@@ -171,7 +171,7 @@ export default function CommentPage() {
                     {charCount}/{MAX_CHARS}
                   </div>
                   <div className='flex justify-center'>
-                    <Button type="submit">
+                    <Button type="submit" disabled={isReplying}>
                       {isReplying ? t("Replying...") : t("Reply")}
                     </Button>
                   </div>

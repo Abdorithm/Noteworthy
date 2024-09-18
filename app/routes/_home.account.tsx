@@ -299,7 +299,7 @@ export default function Account() {
               )}
               <div className="flex justify-end space-x-2">
                 <Button className='ml-2' type="button" variant="outline" onClick={handleEditToggle}>{t("Cancel")}</Button>
-                <Button type="submit">
+                <Button type="submit" disabled={isSaving}>
                   {isSaving ? t("Saving changes...") : t("Save changes")}
                 </Button>
               </div>
