@@ -1,5 +1,9 @@
+import dotenv from 'dotenv';
 import cron from 'node-cron';
 import { PrismaClient } from "@prisma/client";
+
+// Load environment variables from .env file
+dotenv.config();
 
 const prisma = new PrismaClient();
 
@@ -15,7 +19,6 @@ cron.schedule('*/3 * * * *', async () => {
                 }
             }
         });
-        console.log('Expired tokens deleted successfully');
     } catch (error) {
         console.error('Error deleting expired tokens:', error);
     }
