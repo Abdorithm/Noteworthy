@@ -1,6 +1,8 @@
-# Welcome to Noteworthy - a Remix journaling app
+# Welcome to Noteworthy - a Remix social media app
 
-![Logo](public/logo.png)
+<p align="center">
+  <img src="public/logo.png" alt="Logo"/>
+</p>
 
 ## Description
 
@@ -38,11 +40,19 @@ npm install
 This project leverages the power of Remix, a full-stack web framework.
 Remix offered several key advantages during development:
 
-1. **Simplified Data Fetching**: Remix's loader and action functions streamlined data fetching significantly. Loaders are ideal for fetching data before rendering a page, ensuring a more dynamic and responsive user experience. Actions, on the other hand, handle form submissions and other user interactions, providing a seamless way to update data and trigger server-side actions.
+1. **Simplified Data Fetching**: Remix's loader and action functions
+   streamlined data fetching significantly. Loaders are ideal for fetching data
+   before rendering a page, ensuring a more dynamic and responsive user
+   experience. Actions, on the other hand, handle form submissions and other
+   user interactions, providing a seamless way to update data and trigger
+   server-side actions.
 
-2. **Server-Side Rendering (SSR)**: By leveraging SSR, a faster initial page load for users is ensured.
+2. **Server-Side Rendering (SSR)**: By leveraging SSR, a faster initial
+   page load for users is ensured.
 
-3. **Full-Stack Focus**: Remix's full-stack approach provided a unified development environment, streamlining the development process for both frontend and backend components.
+3. **Full-Stack Focus**: Remix's full-stack approach provided a unified
+   development environment, streamlining the development process for both
+   frontend and backend components.
 
 **To run the dev server**:
 
@@ -52,19 +62,28 @@ npm run dev
 
 ### Teck stack
 
-![Teck Stack](public/tech_stack.png)
+<p align="center">
+  <img src="public/tech_stack.png" alt="Tech Stack"/>
+</p>
 
 ### MVP Architecture
 
 #### Passwords are boring
 
-One of the core aspects I was particularly passionate about implementing was **seamless and secure passwordless authentication.** That way I don't have to worry about a password reset functionality and the security burden is on the email provider. A user only provides his username or email upon login.
+One of the core aspects I was particularly passionate about implementing
+was **seamless and secure passwordless authentication.** That way I don't
+have to worry about a password reset functionality and the security burden
+is on the email provider. A user only provides his username or email upon login.
 
-![MVP Arch.](public/mvp_arch.png)
+<p align="center">
+  <img src="public/mvp_arch.png" alt="MVP Architecture"/>
+</p>
 
 ### Database Schema
 
-![DB Schema](public/db_schema.png)
+<p align="center">
+  <img src="public/db_schema.png" alt="DB Schema"/>
+</p>
 
 ## Deployment
 
@@ -86,11 +105,13 @@ Now you'll need to pick a host to deploy it to.
 
 ## Contributing
 
-We welcome contributions to Noteworthy! To ensure a smooth process, please follow these guidelines:
+We welcome contributions to Noteworthy! To ensure a smooth process,
+please follow these guidelines:
 
 ### How to Contribute
 
-1. **Fork the Repository**: Click the "Fork" button at the top right of this repository to create a copy of the repository on your GitHub account.
+1. **Fork the Repository**: Click the "Fork" button at the top right of
+   this repository to create a copy of the repository on your GitHub account.
 
 2. **Clone the Forked Repository**: Clone the forked repository to your local machine.
 
@@ -120,7 +141,9 @@ We welcome contributions to Noteworthy! To ensure a smooth process, please follo
    git push origin feature/your-feature-name
    ```
 
-7. **Create a Pull Request**: Go to the original repository on GitHub and create a pull request from your forked repository. Provide a clear description of your changes and why they are necessary.
+7. **Create a Pull Request**: Go to the original repository on GitHub and
+   create a pull request from your forked repository. Provide a clear description
+   of your changes and why they are necessary.
 
 ### Code Style
 
@@ -130,8 +153,10 @@ We welcome contributions to Noteworthy! To ensure a smooth process, please follo
 
 ### Reporting Issues
 
-- If you find a bug, please create an issue on GitHub with a clear description of the problem and steps to reproduce it.
-- If you have a feature request, please create an issue with a detailed description of the feature and why it would be useful.
+- If you find a bug, please create an issue on GitHub with a clear description
+  of the problem and steps to reproduce it.
+- If you have a feature request, please create an issue with a detailed
+  description of the feature and why it would be useful.
 
 Thank you for contributing to Noteworthy!
 
