@@ -87,7 +87,7 @@ is on the email provider. A user only provides his username or email upon login.
 
 ## Deployment
 
-This project is currently (temporarily) deployed here: [noteworthy.abdorithm.tech](https://noteworthy.abdorithm.tech)
+This project is no longer deployed. You can deploy it to your host.
 
 First, build the app for production:
 
